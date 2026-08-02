@@ -158,7 +158,7 @@
             .form-group { flex-direction: row; }
         }
 
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], input[type="tel"] {
             flex: 1;
             padding: 10px;
             border: 1px solid #d1d5db;
@@ -237,14 +237,21 @@
             color: var(--danger);
         }
 
-        .action-col { display: none; }
-        .admin-active .action-col { display: table-cell; }
+        /* Elementos Privados solo visibles para Admin */
+        .admin-only-col { display: none; }
+        .admin-active .admin-only-col { display: table-cell; }
 
         .empty-state {
             text-align: center;
             padding: 25px 10px;
             color: var(--text-muted);
             font-size: 0.9rem;
+        }
+
+        .phone-tag {
+            color: #4b5563;
+            font-size: 0.82rem;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -292,6 +299,7 @@
         <h2>🔒 Registrar nuevo pago / aportador</h2>
         <form id="personForm" class="form-group">
             <input type="text" id="nameInput" placeholder="Nombre completo" required>
+            <input type="tel" id="phoneInput" placeholder="Teléfono (solo visible para ti)">
             <input type="number" id="amountInput" placeholder="Monto abonado ($)" min="0" step="any">
             <button type="submit" class="btn-submit">Guardar Registro</button>
         </form>
@@ -305,8 +313,9 @@
                 <tr>
                     <th>#</th>
                     <th>Nombre</th>
+                    <th class="admin-only-col">Teléfono (Privado)</th>
                     <th>Aportado</th>
-                    <th class="action-col">Acciones</th>
+                    <th class="admin-only-col">Acciones</th>
                 </tr>
             </thead>
             <tbody id="personList"></tbody>
@@ -382,15 +391,17 @@
             } else {
                 emptyStateEl.style.display = 'none';
                 persons.forEach((p, index) => {
+                    const phoneDisplay = p.phone ? p.phone : 'Sin teléfono';
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${index + 1}</td>
                         <td><strong>${p.name}</strong></td>
+                        <td class="admin-only-col"><span class="phone-tag">📞 ${phoneDisplay}</span></td>
                         <td>${formatCurrency(p.amount)}</td>
-                        <td class="action-col">
+                        <td class="admin-only-col">
                             <div class="actions-cell">
                                 <button class="btn-action btn-add" onclick="addAbono(${index})">+ Abono</button>
-                                <button class="btn-action btn-edit" onclick="editName(${index})">Editar</button>
+                                <button class="btn-action btn-edit" onclick="editPerson(${index})">Editar</button>
                                 <button class="btn-action btn-delete" onclick="deletePerson(${index})">Borrar</button>
                             </div>
                         </td>
@@ -405,14 +416,17 @@
         document.getElementById('personForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const nameInput = document.getElementById('nameInput');
+            const phoneInput = document.getElementById('phoneInput');
             const amountInput = document.getElementById('amountInput');
             
             const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
             const amount = parseFloat(amountInput.value) || 0;
 
             if (name) {
-                persons.push({ name, amount });
+                persons.push({ name, phone, amount });
                 nameInput.value = '';
+                phoneInput.value = '';
                 amountInput.value = '';
                 updateUI();
             }
@@ -434,12 +448,17 @@
             }
         }
 
-        function editName(index) {
+        function editPerson(index) {
             const person = persons[index];
             const newName = prompt("Editar nombre del participante:", person.name);
+            if (newName === null) return;
+
+            const newPhone = prompt("Editar número de teléfono (privado):", person.phone || "");
+            if (newPhone === null) return;
             
-            if (newName !== null && newName.trim() !== '') {
+            if (newName.trim() !== '') {
                 person.name = newName.trim();
+                person.phone = newPhone.trim();
                 updateUI();
             }
         }
