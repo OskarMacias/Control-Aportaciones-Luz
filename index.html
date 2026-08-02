@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Proyecto - Electrificación</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 15px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .btn-admin-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .card.goal { border-left-color: #3b82f6; }
+        .card.collected { border-left-color: #10b981; }
+        .card.pending { border-left-color: var(--warning); }
+        .card.quota { border-left-color: #8b5cf6; }
+
+        .card-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .progress-title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            background: #e5e7eb;
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* Form Section (Admin Only) */
+        .admin-panel {
+            display: none;
+            background: #fffbe3;
+            border: 1px solid #fef3c7;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .admin-panel h2 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #92400e;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .form-group { flex-direction: row; }
+        }
+
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        button.btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Table */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: var(--danger);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-col { display: none; }
+        .admin-active .action-col { display: table-cell; }
+
+        .empty-state {
+            text-align: center;
+            padding: 25px 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="btn-admin-toggle" onclick="toggleAdmin()">⚙️ Modo Admin</button>
+        <h1>⚡ Proyecto Electrificación</h1>
+        <p>Meta total: <strong>$380,000.00 MXN</strong></p>
+    </header>
+
+    <!-- Indicadores en Tiempo Real -->
+    <div class="dashboard">
+        <div class="card quota">
+            <div class="card-title">Inscritos</div>
+            <div class="card-value" id="totalPersons">0</div>
+        </div>
+        <div class="card quota">
+            <div class="card-title">Cuota p/ Persona</div>
+            <div class="card-value" id="quotaPerPerson">$380,000.00</div>
+        </div>
+        <div class="card collected">
+            <div class="card-title">Recaudado</div>
+            <div class="card-value" id="totalCollected">$0.00</div>
+        </div>
+        <div class="card pending">
+            <div class="card-title">Falta Recaudar</div>
+            <div class="card-value" id="totalRemaining">$380,000.00</div>
+        </div>
+    </div>
+
+    <!-- Progreso -->
+    <div class="progress-container">
+        <div class="progress-title">
+            <span>Avance del Fondo ($380,000)</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Panel de Edición (Solo para ti) -->
+    <div class="admin-panel" id="adminPanel">
+        <h2>🔒 Registrar nuevo pago / aportador</h2>
+        <form id="personForm" class="form-group">
+            <input type="text" id="nameInput" placeholder="Nombre completo" required>
+            <input type="number" id="amountInput" placeholder="Monto abonado ($)" min="0" step="any" required>
+            <button type="submit" class="btn-submit">Guardar Registro</button>
+        </form>
+    </div>
+
+    <!-- Lista pública de Aportadores -->
+    <div class="table-card">
+        <h2 style="font-size: 1rem; margin-bottom: 12px;">👥 Lista de Participantes</h2>
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Aportado</th>
+                    <th class="action-col">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="personList"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state">
+            Aún no hay personas registradas en la lista.
+        </div>
+    </div>
+
+    <script>
+        const TOTAL_GOAL = 380000;
+        const ADMIN_PIN = "220920"; // Clave de administrador actualizada
+        let isAdmin = false;
+
+        let persons = JSON.parse(localStorage.getItem('proyecto_luz_personas')) || [];
+
+        const totalPersonsEl = document.getElementById('totalPersons');
+        const quotaPerPersonEl = document.getElementById('quotaPerPerson');
+        const totalCollectedEl = document.getElementById('totalCollected');
+        const totalRemainingEl = document.getElementById('totalRemaining');
+        const progressBarEl = document.getElementById('progressBar');
+        const progressPercentEl = document.getElementById('progressPercent');
+        const personListEl = document.getElementById('personList');
+        const emptyStateEl = document.getElementById('emptyState');
+        const adminPanel = document.getElementById('adminPanel');
+        const mainTable = document.getElementById('mainTable');
+
+        function formatCurrency(val) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 2
+            }).format(val);
+        }
+
+        function toggleAdmin() {
+            if (!isAdmin) {
+                const pin = prompt("Ingresa la clave de administrador para registrar o modificar datos:");
+                if (pin === ADMIN_PIN) {
+                    isAdmin = true;
+                    adminPanel.style.display = 'block';
+                    mainTable.classList.add('admin-active');
+                    alert("Modo Administrador activado.");
+                } else if (pin !== null) {
+                    alert("Clave incorrecta. Modo consulta activa.");
+                }
+            } else {
+                isAdmin = false;
+                adminPanel.style.display = 'none';
+                mainTable.classList.remove('admin-active');
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const count = persons.length;
+            const quota = count > 0 ? (TOTAL_GOAL / count) : TOTAL_GOAL;
+            const collected = persons.reduce((sum, p) => sum + p.amount, 0);
+            const remaining = Math.max(0, TOTAL_GOAL - collected);
+            const percent = Math.min(100, (collected / TOTAL_GOAL) * 100);
+
+            totalPersonsEl.textContent = count;
+            quotaPerPersonEl.textContent = formatCurrency(quota);
+            totalCollectedEl.textContent = formatCurrency(collected);
+            totalRemainingEl.textContent = formatCurrency(remaining);
+
+            progressBarEl.style.width = percent.toFixed(1) + '%';
+            progressPercentEl.textContent = percent.toFixed(1) + '%';
+
+            personListEl.innerHTML = '';
+            if (count === 0) {
+                emptyStateEl.style.display = 'block';
+            } else {
+                emptyStateEl.style.display = 'none';
+                persons.forEach((p, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${formatCurrency(p.amount)}</td>
+                        <td class="action-col">
+                            <button class="btn-delete" onclick="deletePerson(${index})">Borrar</button>
+                        </td>
+                    `;
+                    personListEl.appendChild(tr);
+                });
+            }
+
+            localStorage.setItem('proyecto_luz_personas', JSON.stringify(persons));
+        }
+
+        document.getElementById('personForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('nameInput');
+            const amountInput = document.getElementById('amountInput');
+            
+            const name = nameInput.value.trim();
+            const amount = parseFloat(amountInput.value) || 0;
+
+            if (name) {
+                persons.push({ name, amount });
+                nameInput.value = '';
+                amountInput.value = '';
+                updateUI();
+            }
+        });
+
+        function deletePerson(index) {
+            if (confirm(`¿Eliminar a "${persons[index].name}"?`)) {
+                persons.splice(index, 1);
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
