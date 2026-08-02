@@ -14,6 +14,7 @@
             --text-muted: #6b7280;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --info: #3b82f6;
         }
 
         * {
@@ -203,16 +204,37 @@
         td {
             padding: 10px;
             border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
         }
 
-        .btn-delete {
-            background: #fee2e2;
-            color: var(--danger);
+        .actions-cell {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.75rem;
             border: none;
             cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-add {
+            background: #d1fae5;
+            color: var(--primary-dark);
+        }
+
+        .btn-edit {
+            background: #dbeafe;
+            color: var(--info);
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: var(--danger);
         }
 
         .action-col { display: none; }
@@ -270,7 +292,7 @@
         <h2>🔒 Registrar nuevo pago / aportador</h2>
         <form id="personForm" class="form-group">
             <input type="text" id="nameInput" placeholder="Nombre completo" required>
-            <input type="number" id="amountInput" placeholder="Monto abonado ($)" min="0" step="any" required>
+            <input type="number" id="amountInput" placeholder="Monto abonado ($)" min="0" step="any">
             <button type="submit" class="btn-submit">Guardar Registro</button>
         </form>
     </div>
@@ -284,7 +306,7 @@
                     <th>#</th>
                     <th>Nombre</th>
                     <th>Aportado</th>
-                    <th class="action-col">Acción</th>
+                    <th class="action-col">Acciones</th>
                 </tr>
             </thead>
             <tbody id="personList"></tbody>
@@ -296,7 +318,7 @@
 
     <script>
         const TOTAL_GOAL = 380000;
-        const ADMIN_PIN = "220920"; // Clave de administrador actualizada
+        const ADMIN_PIN = "220920";
         let isAdmin = false;
 
         let persons = JSON.parse(localStorage.getItem('proyecto_luz_personas')) || [];
@@ -322,14 +344,14 @@
 
         function toggleAdmin() {
             if (!isAdmin) {
-                const pin = prompt("Ingresa la clave de administrador para registrar o modificar datos:");
+                const pin = prompt("Ingresa la clave de administrador:");
                 if (pin === ADMIN_PIN) {
                     isAdmin = true;
                     adminPanel.style.display = 'block';
                     mainTable.classList.add('admin-active');
                     alert("Modo Administrador activado.");
                 } else if (pin !== null) {
-                    alert("Clave incorrecta. Modo consulta activa.");
+                    alert("Clave incorrecta. Modo consulta activo.");
                 }
             } else {
                 isAdmin = false;
@@ -366,7 +388,11 @@
                         <td><strong>${p.name}</strong></td>
                         <td>${formatCurrency(p.amount)}</td>
                         <td class="action-col">
-                            <button class="btn-delete" onclick="deletePerson(${index})">Borrar</button>
+                            <div class="actions-cell">
+                                <button class="btn-action btn-add" onclick="addAbono(${index})">+ Abono</button>
+                                <button class="btn-action btn-edit" onclick="editName(${index})">Editar</button>
+                                <button class="btn-action btn-delete" onclick="deletePerson(${index})">Borrar</button>
+                            </div>
                         </td>
                     `;
                     personListEl.appendChild(tr);
@@ -391,6 +417,32 @@
                 updateUI();
             }
         });
+
+        function addAbono(index) {
+            const person = persons[index];
+            const extraAmount = prompt(`Ingresa el nuevo abono para "${person.name}":\n(Monto actual: ${formatCurrency(person.amount)})`);
+            
+            if (extraAmount !== null && extraAmount.trim() !== '') {
+                const parsedExtra = parseFloat(extraAmount);
+                if (!isNaN(parsedExtra) && parsedExtra > 0) {
+                    person.amount += parsedExtra;
+                    updateUI();
+                    alert(`Abono agregado. Nuevo saldo de ${person.name}: ${formatCurrency(person.amount)}`);
+                } else {
+                    alert("Por favor ingresa un monto válido.");
+                }
+            }
+        }
+
+        function editName(index) {
+            const person = persons[index];
+            const newName = prompt("Editar nombre del participante:", person.name);
+            
+            if (newName !== null && newName.trim() !== '') {
+                person.name = newName.trim();
+                updateUI();
+            }
+        }
 
         function deletePerson(index) {
             if (confirm(`¿Eliminar a "${persons[index].name}"?`)) {
