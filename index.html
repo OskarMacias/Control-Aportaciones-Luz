@@ -3,474 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado del Proyecto - Electrificación</title>
-    <style>
-        :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --bg: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            padding: 15px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #059669, #10b981);
-            color: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        header h1 {
-            font-size: 1.4rem;
-            margin-bottom: 5px;
-        }
-
-        header p {
-            font-size: 0.85rem;
-            opacity: 0.95;
-        }
-
-        .btn-admin-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        /* Dashboard */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary);
-        }
-
-        .card.goal { border-left-color: #3b82f6; }
-        .card.collected { border-left-color: #10b981; }
-        .card.pending { border-left-color: var(--warning); }
-        .card.quota { border-left-color: #8b5cf6; }
-
-        .card-title {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .card-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-
-        .progress-title {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-bg {
-            background: #e5e7eb;
-            height: 14px;
-            border-radius: 7px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-
-        /* Form Section (Admin Only) */
-        .admin-panel {
-            display: none;
-            background: #fffbe3;
-            border: 1px solid #fef3c7;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .admin-panel h2 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: #92400e;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        @media (min-width: 600px) {
-            .form-group { flex-direction: row; }
-        }
-
-        input[type="text"], input[type="number"], input[type="tel"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-
-        button.btn-submit {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Table */
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
-
-        th {
-            background: #f9fafb;
-            padding: 10px;
-            color: var(--text-muted);
-            font-weight: 600;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: middle;
-        }
-
-        .actions-cell {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btn-add {
-            background: #d1fae5;
-            color: var(--primary-dark);
-        }
-
-        .btn-edit {
-            background: #dbeafe;
-            color: var(--info);
-        }
-
-        .btn-delete {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        /* Elementos Privados solo visibles para Admin */
-        .admin-only-col { display: none; }
-        .admin-active .admin-only-col { display: table-cell; }
-
-        .empty-state {
-            text-align: center;
-            padding: 25px 10px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .phone-tag {
-            color: #4b5563;
-            font-size: 0.82rem;
-            font-weight: 500;
-        }
-    </style>
+    <title>Control de Paquetería - Oskar Macías</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tesseract.js para OCR en el cliente -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
 
-    <header>
-        <button class="btn-admin-toggle" onclick="toggleAdmin()">⚙️ Modo Admin</button>
-        <h1>⚡ Proyecto Electrificación</h1>
-        <p>Meta total: <strong>$380,000.00 MXN</strong></p>
+    <!-- Header / Navbar -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-orange-500 text-white p-2 rounded-xl shadow-lg shadow-orange-500/30">
+                    <i class="fa-solid fa-box-archive text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Control de Paquetería</h1>
+                    <p class="text-xs text-slate-400">Escáner OCR & Registro Inteligente</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-slate-300 font-medium">Sistema Activo</span>
+            </div>
+        </div>
     </header>
 
-    <!-- Indicadores en Tiempo Real -->
-    <div class="dashboard">
-        <div class="card quota">
-            <div class="card-title">Inscritos</div>
-            <div class="card-value" id="totalPersons">0</div>
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- Métricas Principales (KPIs) -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <!-- Total Recibidos -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
+                <div class="flex justify-between items-start text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Total Recibidos</span>
+                    <i class="fa-solid fa-boxes-packing text-blue-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white" id="kpi-total">0</div>
+                <div class="text-[10px] text-slate-400 mt-1">Paquetes procesados</div>
+            </div>
+
+            <!-- Entregado Firmado -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
+                <div class="flex justify-between items-start text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Firmados</span>
+                    <i class="fa-solid fa-file-signature text-emerald-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-emerald-400" id="kpi-firmados">0</div>
+                <div class="text-[10px] text-slate-400 mt-1">Entrega confirmada</div>
+            </div>
+
+            <!-- Entregado No Firmado -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
+                <div class="flex justify-between items-start text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">No Firmados</span>
+                    <i class="fa-solid fa-user-check text-sky-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-sky-400" id="kpi-nofirmados">0</div>
+                <div class="text-[10px] text-slate-400 mt-1">Entrega en buzón/tercero</div>
+            </div>
+
+            <!-- Devoluciones -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
+                <div class="flex justify-between items-start text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Devoluciones</span>
+                    <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-amber-400" id="kpi-devoluciones">0</div>
+                <div class="text-[10px] text-slate-400 mt-1">Retornados al almacén</div>
+            </div>
+
+            <!-- Mal Clasificados -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition col-span-2 md:col-span-1">
+                <div class="flex justify-between items-start text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Mal Clasificados</span>
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-rose-400" id="kpi-malclasificados">0</div>
+                <div class="text-[10px] text-slate-400 mt-1">Error de zona / ruta</div>
+            </div>
         </div>
-        <div class="card quota">
-            <div class="card-title">Cuota p/ Persona</div>
-            <div class="card-value" id="quotaPerPerson">$380,000.00</div>
-        </div>
-        <div class="card collected">
-            <div class="card-title">Recaudado</div>
-            <div class="card-value" id="totalCollected">$0.00</div>
-        </div>
-        <div class="card pending">
-            <div class="card-title">Falta Recaudar</div>
-            <div class="card-value" id="totalRemaining">$380,000.00</div>
-        </div>
-    </div>
 
-    <!-- Progreso -->
-    <div class="progress-container">
-        <div class="progress-title">
-            <span>Avance del Fondo ($380,000)</span>
-            <span id="progressPercent">0%</span>
-        </div>
-        <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progressBar"></div>
-        </div>
-    </div>
-
-    <!-- Panel de Edición (Solo para ti) -->
-    <div class="admin-panel" id="adminPanel">
-        <h2>🔒 Registrar nuevo pago / aportador</h2>
-        <form id="personForm" class="form-group">
-            <input type="text" id="nameInput" placeholder="Nombre completo" required>
-            <input type="tel" id="phoneInput" placeholder="Teléfono (solo visible para ti)">
-            <input type="number" id="amountInput" placeholder="Monto abonado ($)" min="0" step="any">
-            <button type="submit" class="btn-submit">Guardar Registro</button>
-        </form>
-    </div>
-
-    <!-- Lista pública de Aportadores -->
-    <div class="table-card">
-        <h2 style="font-size: 1rem; margin-bottom: 12px;">👥 Lista de Participantes</h2>
-        <table id="mainTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th class="admin-only-col">Teléfono (Privado)</th>
-                    <th>Aportado</th>
-                    <th class="admin-only-col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="personList"></tbody>
-        </table>
-        <div id="emptyState" class="empty-state">
-            Aún no hay personas registradas en la lista.
-        </div>
-    </div>
-
-    <script>
-        const TOTAL_GOAL = 380000;
-        const ADMIN_PIN = "220920";
-        let isAdmin = false;
-
-        let persons = JSON.parse(localStorage.getItem('proyecto_luz_personas')) || [];
-
-        const totalPersonsEl = document.getElementById('totalPersons');
-        const quotaPerPersonEl = document.getElementById('quotaPerPerson');
-        const totalCollectedEl = document.getElementById('totalCollected');
-        const totalRemainingEl = document.getElementById('totalRemaining');
-        const progressBarEl = document.getElementById('progressBar');
-        const progressPercentEl = document.getElementById('progressPercent');
-        const personListEl = document.getElementById('personList');
-        const emptyStateEl = document.getElementById('emptyState');
-        const adminPanel = document.getElementById('adminPanel');
-        const mainTable = document.getElementById('mainTable');
-
-        function formatCurrency(val) {
-            return new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: 'MXN',
-                minimumFractionDigits: 2
-            }).format(val);
-        }
-
-        function toggleAdmin() {
-            if (!isAdmin) {
-                const pin = prompt("Ingresa la clave de administrador:");
-                if (pin === ADMIN_PIN) {
-                    isAdmin = true;
-                    adminPanel.style.display = 'block';
-                    mainTable.classList.add('admin-active');
-                    alert("Modo Administrador activado.");
-                } else if (pin !== null) {
-                    alert("Clave incorrecta. Modo consulta activo.");
-                }
-            } else {
-                isAdmin = false;
-                adminPanel.style.display = 'none';
-                mainTable.classList.remove('admin-active');
-            }
-            updateUI();
-        }
-
-        function updateUI() {
-            const count = persons.length;
-            const quota = count > 0 ? (TOTAL_GOAL / count) : TOTAL_GOAL;
-            const collected = persons.reduce((sum, p) => sum + p.amount, 0);
-            const remaining = Math.max(0, TOTAL_GOAL - collected);
-            const percent = Math.min(100, (collected / TOTAL_GOAL) * 100);
-
-            totalPersonsEl.textContent = count;
-            quotaPerPersonEl.textContent = formatCurrency(quota);
-            totalCollectedEl.textContent = formatCurrency(collected);
-            totalRemainingEl.textContent = formatCurrency(remaining);
-
-            progressBarEl.style.width = percent.toFixed(1) + '%';
-            progressPercentEl.textContent = percent.toFixed(1) + '%';
-
-            personListEl.innerHTML = '';
-            if (count === 0) {
-                emptyStateEl.style.display = 'block';
-            } else {
-                emptyStateEl.style.display = 'none';
-                persons.forEach((p, index) => {
-                    const phoneDisplay = p.phone ? p.phone : 'Sin teléfono';
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td><strong>${p.name}</strong></td>
-                        <td class="admin-only-col"><span class="phone-tag">📞 ${phoneDisplay}</span></td>
-                        <td>${formatCurrency(p.amount)}</td>
-                        <td class="admin-only-col">
-                            <div class="actions-cell">
-                                <button class="btn-action btn-add" onclick="addAbono(${index})">+ Abono</button>
-                                <button class="btn-action btn-edit" onclick="editPerson(${index})">Editar</button>
-                                <button class="btn-action btn-delete" onclick="deletePerson(${index})">Borrar</button>
-                            </div>
-                        </td>
-                    `;
-                    personListEl.appendChild(tr);
-                });
-            }
-
-            localStorage.setItem('proyecto_luz_personas', JSON.stringify(persons));
-        }
-
-        document.getElementById('personForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nameInput = document.getElementById('nameInput');
-            const phoneInput = document.getElementById('phoneInput');
-            const amountInput = document.getElementById('amountInput');
+        <!-- Sección Principal: Captura y Formulario -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            const name = nameInput.value.trim();
-            const phone = phoneInput.value.trim();
-            const amount = parseFloat(amountInput.value) || 0;
+            <!-- Zona de Carga de Imagen y Cámara -->
+            <div class="lg:col-span-5 bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-camera text-orange-400"></i>
+                        Escanear Foto de Etiqueta
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-4">Carga una foto o toma una captura desde la cámara para extraer los datos de la guía automáticamente.</p>
+                    
+                    <!-- Previsualización / Dropzone -->
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 hover:border-orange-500 rounded-xl p-6 text-center transition cursor-pointer bg-slate-900/50 group relative overflow-hidden min-h-[220px] flex flex-col items-center justify-center">
+                        <input type="file" id="imageInput" accept="image/*" capture="environment" class="hidden">
+                        
+                        <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/80 backdrop-blur" alt="Vista previa">
+                        
+                        <div id="dropzoneText" class="space-y-3">
+                            <div class="w-14 h-14 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                                <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-200">Haz clic para tomar foto o subir archivo</p>
+                                <p class="text-xs text-slate-400 mt-1">Soporta JPG, PNG, WEBP</p>
+                            </div>
+                        </div>
+                    </div>
 
-            if (name) {
-                persons.push({ name, phone, amount });
-                nameInput.value = '';
-                phoneInput.value = '';
-                amountInput.value = '';
-                updateUI();
+                    <!-- Progreso del OCR -->
+                    <div id="ocrProgress" class="hidden mt-4 space-y-2">
+                        <div class="flex justify-between text-xs text-slate-300 font-medium">
+                            <span id="ocrStatus">Analizando etiqueta...</span>
+                            <span id="ocrPercent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                            <div id="ocrBar" class="bg-orange-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" onclick="document.getElementById('imageInput').click()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        Seleccionar / Tomar otra Imagen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulario de Confirmación de Registro -->
+            <div class="lg:col-span-7 bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4">
+                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-orange-400"></i>
+                    Datos Extraídos & Clasificación
+                </h2>
+
+                <form id="packageForm" onsubmit="savePackage(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Número de Seguimiento -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Número de Seguimiento / Guía *</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-barcode text-xs"></i>
+                                </span>
+                                <input type="text" id="inputTracking" required placeholder="Ej. JMX300992598902" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+
+                        <!-- Nombre del Cliente -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo *</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-user text-xs"></i>
+                                </span>
+                                <input type="text" id="inputName" required placeholder="Ej. Mónica Leyva" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Teléfono *</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                </span>
+                                <input type="tel" id="inputPhone" required placeholder="Ej. 6721095759" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+
+                        <!-- Plataforma / Tienda -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Plataforma / Tienda *</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-store text-xs"></i>
+                                </span>
+                                <select id="inputPlatform" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                                    <option value="SHEIN">SHEIN</option>
+                                    <option value="Temu">Temu</option>
+                                    <option value="TikTok Shop">TikTok Shop</option>
+                                    <option value="Mercado Libre">Mercado Libre</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="Otra">Otra</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clasificación / Estado Obligatorio -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Paquete / Clasificación *</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+                                <input type="radio" name="statusOption" value="Firmado" checked class="hidden">
+                                <i class="fa-solid fa-file-signature text-emerald-400 text-lg"></i>
+                                <span class="text-xs font-medium text-slate-200 text-center">Firmado</span>
+                            </label>
+
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-sky-500 transition has-[:checked]:border-sky-500 has-[:checked]:bg-sky-950/30">
+                                <input type="radio" name="statusOption" value="No Firmado" class="hidden">
+                                <i class="fa-solid fa-user-check text-sky-400 text-lg"></i>
+                                <span class="text-xs font-medium text-slate-200 text-center">No Firmado</span>
+                            </label>
+
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
+                                <input type="radio" name="statusOption" value="Devolucion" class="hidden">
+                                <i class="fa-solid fa-rotate-left text-amber-400 text-lg"></i>
+                                <span class="text-xs font-medium text-slate-200 text-center">Devolución</span>
+                            </label>
+
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
+                                <input type="radio" name="statusOption" value="Mal Clasificado" class="hidden">
+                                <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>
+                                <span class="text-xs font-medium text-slate-200 text-center">Mal Clasificado</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        Guardar Paquete en el Registro
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de Registros e Historial -->
+        <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-orange-400"></i>
+                        Historial de Paquetes
+                    </h2>
+                    <p class="text-xs text-slate-400">Registro detallado con búsqueda y filtrado por estado.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <!-- Buscador -->
+                    <div class="relative flex-1 sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar por cliente o guía..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                    </div>
+
+                    <!-- Exportar CSV -->
+                    <button onclick="exportToCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla Responsiva -->
+            <div class="overflow-x-auto rounded-xl border border-slate-700">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="py-3 px-4">Nº Seguimiento</th>
+                            <th class="py-3 px-4">Nombre Destinatario</th>
+                            <th class="py-3 px-4">Teléfono</th>
+                            <th class="py-3 px-4">Plataforma</th>
+                            <th class="py-3 px-4">Estado</th>
+                            <th class="py-3 px-4 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packageTableBody" class="divide-y divide-slate-700/60 bg-slate-900/30">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script de Lógica del Negocio -->
+    <script>
+        // Array principal de datos (Persistente en localStorage)
+        let packages = JSON.parse(localStorage.getItem('oskar_packages_data')) || [
+            {
+                id: '1',
+                tracking: 'JMX300992598902',
+                name: 'Mónica Leyva',
+                phone: '6721095759',
+                platform: 'SHEIN',
+                status: 'Firmado',
+                date: new Date().toISOString()
             }
+        ];
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPackages();
+            setupOCR();
         });
 
-        function addAbono(index) {
-            const person = persons[index];
-            const extraAmount = prompt(`Ingresa el nuevo abono para "${person.name}":\n(Monto actual: ${formatCurrency(person.amount)})`);
-            
-            if (extraAmount !== null && extraAmount.trim() !== '') {
-                const parsedExtra = parseFloat(extraAmount);
-                if (!isNaN(parsedExtra) && parsedExtra > 0) {
-                    person.amount += parsedExtra;
-                    updateUI();
-                    alert(`Abono agregado. Nuevo saldo de ${person.name}: ${formatCurrency(person.amount)}`);
-                } else {
-                    alert("Por favor ingresa un monto válido.");
+        // Configuración de OCR para extracción automática desde la imagen
+        function setupOCR() {
+            const imageInput = document.getElementById('imageInput');
+            const dropzone = document.getElementById('dropzone');
+
+            dropzone.addEventListener('click', () => imageInput.click());
+
+            imageInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Mostrar previsualización
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.src = event.target.result;
+                    imgPreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                // Iniciar reconocimiento OCR
+                const ocrProgress = document.getElementById('ocrProgress');
+                const ocrBar = document.getElementById('ocrBar');
+                const ocrStatus = document.getElementById('ocrStatus');
+                const ocrPercent = document.getElementById('ocrPercent');
+
+                ocrProgress.classList.remove('hidden');
+
+                try {
+                    const worker = await Tesseract.createWorker('spa');
+                    
+                    worker.setParameters({
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const progress = Math.round(m.progress * 100);
+                                ocrBar.style.width = `${progress}%`;
+                                ocrPercent.innerText = `${progress}%`;
+                                ocrStatus.innerText = 'Extrayendo texto de la guía...';
+                            }
+                        }
+                    });
+
+                    const { data: { text } } = await worker.recognize(file);
+                    await worker.terminate();
+
+                    ocrStatus.innerText = '¡Extracción completada!';
+                    parseOCRText(text);
+
+                } catch (error) {
+                    console.error('Error OCR:', error);
+                    ocrStatus.innerText = 'Error al leer imagen. Ingresa manualmente.';
+                } finally {
+                    setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
                 }
+            });
+        }
+
+        // Analizador sintáctico para extraer los datos requeridos
+        function parseOCRText(text) {
+            console.log("Texto detectado:", text);
+
+            // 1. Extraer Tracking / Número de Guía
+            const trackingMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
+            if (trackingMatch) {
+                document.getElementById('inputTracking').value = trackingMatch[0].toUpperCase();
+            }
+
+            // 2. Extraer Nombre
+            const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
+            if (nameMatch) {
+                document.getElementById('inputName').value = nameMatch[1].trim();
+            }
+
+            // 3. Extraer Teléfono
+            const phoneMatch = text.match(/\b(\d{10}|\d{3}[\s-]?\d{3}[\s-]?\d{4})\b/);
+            if (phoneMatch) {
+                document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
+            }
+
+            // 4. Identificar Plataforma
+            const upperText = text.toUpperCase();
+            const platformSelect = document.getElementById('inputPlatform');
+            if (upperText.includes('SHEIN')) platformSelect.value = 'SHEIN';
+            else if (upperText.includes('TEMU')) platformSelect.value = 'Temu';
+            else if (upperText.includes('TIKTOK')) platformSelect.value = 'TikTok Shop';
+            else if (upperText.includes('MERCADO')) platformSelect.value = 'Mercado Libre';
+            else if (upperText.includes('AMAZON')) platformSelect.value = 'Amazon';
+        }
+
+        // Guardar nuevo paquete
+        function savePackage(event) {
+            event.preventDefault();
+
+            const tracking = document.getElementById('inputTracking').value.trim();
+            const name = document.getElementById('inputName').value.trim();
+            const phone = document.getElementById('inputPhone').value.trim();
+            const platform = document.getElementById('inputPlatform').value;
+            const status = document.querySelector('input[name="statusOption"]:checked').value;
+
+            const newPackage = {
+                id: Date.now().toString(),
+                tracking,
+                name,
+                phone,
+                platform,
+                status,
+                date: new Date().toISOString()
+            };
+
+            packages.unshift(newPackage);
+            saveAndRefresh();
+
+            // Limpiar formulario
+            document.getElementById('packageForm').reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        // Cambiar estado
+        function updateStatus(id, newStatus) {
+            packages = packages.map(p => p.id === id ? { ...p, status: newStatus } : p);
+            saveAndRefresh();
+        }
+
+        // Eliminar paquete
+        function deletePackage(id) {
+            if (confirm('¿Deseas eliminar este registro de paquete?')) {
+                packages = packages.filter(p => p.id !== id);
+                saveAndRefresh();
             }
         }
 
-        function editPerson(index) {
-            const person = persons[index];
-            const newName = prompt("Editar nombre del participante:", person.name);
-            if (newName === null) return;
-
-            const newPhone = prompt("Editar número de teléfono (privado):", person.phone || "");
-            if (newPhone === null) return;
-            
-            if (newName.trim() !== '') {
-                person.name = newName.trim();
-                person.phone = newPhone.trim();
-                updateUI();
-            }
+        // Guardar en LocalStorage y renderizar
+        function saveAndRefresh() {
+            localStorage.setItem('oskar_packages_data', JSON.stringify(packages));
+            renderPackages();
         }
 
-        function deletePerson(index) {
-            if (confirm(`¿Eliminar a "${persons[index].name}"?`)) {
-                persons.splice(index, 1);
-                updateUI();
+        // Renderizar Métricas y Tabla
+        function renderPackages() {
+            const tableBody = document.getElementById('packageTableBody');
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            // Calcular KPIs
+            const total = packages.length;
+            const firmados = packages.filter(p => p.status === 'Firmado').length;
+            const nofirmados = packages.filter(p => p.status === 'No Firmado').length;
+            const devoluciones = packages.filter(p => p.status === 'Devolucion').length;
+            const malclasificados = packages.filter(p => p.status === 'Mal Clasificado').length;
+
+            document.getElementById('kpi-total').innerText = total;
+            document.getElementById('kpi-firmados').innerText = firmados;
+            document.getElementById('kpi-nofirmados').innerText = nofirmados;
+            document.getElementById('kpi-devoluciones').innerText = devoluciones;
+            document.getElementById('kpi-malclasificados').innerText = malclasificados;
+
+            // Filtrar tabla
+            const filtered = packages.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                p.tracking.toLowerCase().includes(query) ||
+                p.phone.includes(query)
+            );
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-500 text-xs">
+                            No hay paquetes registrados que coincidan con la búsqueda.
+                        </td>
+                    </tr>
+                `;
+                return;
             }
+
+            tableBody.innerHTML = filtered.map(p => {
+                let badgeClass = '';
+                if (p.status === 'Firmado') badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                else if (p.status === 'No Firmado') badgeClass = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
+                else if (p.status === 'Devolucion') badgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                else if (p.status === 'Mal Clasificado') badgeClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+
+                return `
+                    <tr class="hover:bg-slate-800/50 transition">
+                        <td class="py-3 px-4 font-mono text-xs font-semibold text-orange-400">${p.tracking}</td>
+                        <td class="py-3 px-4 font-medium text-slate-100">${p.name}</td>
+                        <td class="py-3 px-4 text-xs font-mono text-slate-300">${p.phone}</td>
+                        <td class="py-3 px-4 text-xs text-slate-300">${p.platform}</td>
+                        <td class="py-3 px-4">
+                            <select onchange="updateStatus('${p.id}', this.value)" class="bg-slate-900 text-xs border border-slate-700 rounded-lg py-1 px-2 focus:outline-none ${badgeClass}">
+                                <option value="Firmado" ${p.status === 'Firmado' ? 'selected' : ''}>Firmado</option>
+                                <option value="No Firmado" ${p.status === 'No Firmado' ? 'selected' : ''}>No Firmado</option>
+                                <option value="Devolucion" ${p.status === 'Devolucion' ? 'selected' : ''}>Devolución</option>
+                                <option value="Mal Clasificado" ${p.status === 'Mal Clasificado' ? 'selected' : ''}>Mal Clasificado</option>
+                            </select>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button onclick="deletePackage('${p.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg transition" title="Eliminar">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        updateUI();
+        // Filtro rápido por campo de texto
+        function filterTable() {
+            renderPackages();
+        }
+
+        // Exportación de datos a CSV
+        function exportToCSV() {
+            if (packages.length === 0) return alert('No hay datos para exportar');
+            let csv = 'Tracking,Nombre,Telefono,Plataforma,Estado,Fecha\n';
+            packages.forEach(p => {
+                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.status}","${p.date}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `control_paqueteria_${new Date().toISOString().slice(0,10)}.csv`);
+            a.click();
+        }
     </script>
 </body>
 </html>
