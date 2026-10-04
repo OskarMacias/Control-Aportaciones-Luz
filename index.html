@@ -22,7 +22,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white">Control de Paquetería</h1>
-                    <p class="text-xs text-slate-400">Gestión de Turnos, Cuentas & Re-enrutado Automático</p>
+                    <p class="text-xs text-slate-400">Gestión de Turnos, Resguardos & Búsqueda Histórica</p>
                 </div>
             </div>
             <div id="shiftBadge" class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
@@ -34,15 +34,15 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- 1. SECCIÓN DE CONTROL DE TURNO Y DESGLOSE POR CUENTAS -->
+        <!-- 1. CONTROL DE TURNO DIARIO Y RESUMEN -->
         <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-5">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700/60 pb-4">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
-                        Apertura y Cierre de Turno Diario
+                        Apertura y Cierre de Turno
                     </h2>
-                    <p class="text-xs text-slate-400">Ingresa paquetes nuevos al abrir turno. Las anomalías del día anterior se re-enrutan automáticamente.</p>
+                    <p class="text-xs text-slate-400">Control diario de volumen, cuadre por cuenta y anomalías pendientes de enrutar.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btnStartShift" onclick="toggleShiftModal('start')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
@@ -54,14 +54,14 @@
                 </div>
             </div>
 
-            <!-- Resumen Visual del Turno Actual -->
+            <!-- Dashboard de KPIs -->
             <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-slate-400 uppercase">Recibidos Nuevos</span>
+                    <span class="text-[10px] font-medium text-slate-400 uppercase">Nuevos Recibidos</span>
                     <div class="text-xl font-bold text-white mt-1" id="dashReceived">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-amber-400 uppercase">Re-enrutados (Anomalías)</span>
+                    <span class="text-[10px] font-medium text-amber-400 uppercase">Re-enrutados</span>
                     <div class="text-xl font-bold text-amber-400 mt-1" id="dashRerouted">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
@@ -76,24 +76,46 @@
                     <span class="text-[10px] font-medium text-indigo-400 uppercase">Cuenta Zahori</span>
                     <div class="text-xl font-bold text-indigo-400 mt-1" id="dashZahori">0</div>
                 </div>
-                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 col-span-2 md:col-span-1">
-                    <span class="text-[10px] font-medium text-rose-400 uppercase">Devoluciones / Rechazo</span>
-                    <div class="text-xl font-bold text-rose-400 mt-1" id="dashDevoluciones">0</div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-purple-400 uppercase">En Resguardo Activo</span>
+                    <div class="text-xl font-bold text-purple-400 mt-1" id="dashResguardoTotal">0</div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. CAPTURA OCR DE PAQUETES / ESCÁNER EN RUTA -->
+        <!-- 2. BÚSQUEDA HISTÓRICA DE CLIENTES Y BASE DE DATOS DE RESGUARDOS -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
+            <div>
+                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-database text-orange-400"></i>
+                    Buscador Histórico de Clientes & Resguardos
+                </h2>
+                <p class="text-xs text-slate-400">Consulta cuántos paquetes ha tenido en resguardo una persona, en qué fechas y cuántos días lleva su paquete actual guardado.</p>
+            </div>
+
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="dbSearchInput" oninput="searchCustomerDB()" placeholder="Ingresa Nombre completo o Número de Teléfono del cliente..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+            </div>
+
+            <div id="dbSearchResult" class="hidden bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
+                <!-- Resultado dinámico de la búsqueda -->
+            </div>
+        </div>
+
+        <!-- 3. ESCÁNER OCR Y FORMULARIO DE REGISTRO CON FECHA DE RESGUARDO -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Carga de Imagen y Escáner -->
+            <!-- Zona OCR / Escáner -->
             <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
-                        Escanear Guía / INE
+                        Escáner de Guías / Identificación
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Si escaneas una guía con anomalía previa, el sistema la re-enruta automáticamente a **En Reparto**.</p>
+                    <p class="text-xs text-slate-400 mb-4">Si escaneas un paquete que estaba **En Resguardo**, el sistema lo marcará como **Entregado** automáticamente.</p>
 
                     <input type="file" id="imageInputGallery" accept="image/*" class="hidden">
                     <input type="file" id="imageInputCamera" accept="image/*" capture="environment" class="hidden">
@@ -105,11 +127,10 @@
                             <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
                                 <i class="fa-solid fa-barcode text-xl"></i>
                             </div>
-                            <p class="text-xs font-medium text-slate-300">Escanea la guía para re-enrutar o registrar</p>
+                            <p class="text-xs font-medium text-slate-300">Escanea la guía para entrega rápida o captura</p>
                         </div>
                     </div>
 
-                    <!-- Progreso OCR -->
                     <div id="ocrProgress" class="hidden mt-4 space-y-2">
                         <div class="flex justify-between text-xs text-slate-300 font-medium">
                             <span id="ocrStatus">Procesando OCR...</span>
@@ -131,11 +152,11 @@
                 </div>
             </div>
 
-            <!-- Formulario de Registro / Modificación -->
+            <!-- Formulario de Registro -->
             <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-orange-400"></i>
-                    Registro de Paquete / Clasificación
+                    Registro y Clasificación de Paquete
                 </h2>
 
                 <form id="packageForm" onsubmit="savePackage(event)" class="space-y-4">
@@ -146,7 +167,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo *</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo del Cliente *</label>
                             <input type="text" id="inputName" required placeholder="Ej. Mónica Leyva" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
@@ -169,41 +190,48 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Cuenta Asignada *</label>
-                            <select id="inputAccount" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Cuenta Asignada</label>
+                            <select id="inputAccount" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
                                 <option value="Damaris">Damaris</option>
                                 <option value="Oskar">Oskar</option>
                                 <option value="Zahori">Zahori</option>
                             </select>
                         </div>
+
+                        <!-- Campo de Fecha Personalizada para Resguardos Previos -->
+                        <div>
+                            <label class="block text-xs font-medium text-amber-400 mb-1">Fecha de Entrada a Resguardo</label>
+                            <input type="date" id="inputResguardoDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                            <span class="text-[10px] text-slate-500">Para ordenar por fecha histórica de resguardo.</span>
+                        </div>
                     </div>
 
-                    <!-- Estados de Registro -->
+                    <!-- Selección de Estado -->
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Registro *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-                                <input type="radio" name="statusOption" value="Entregado" checked class="hidden">
+                                <input type="radio" name="statusOption" value="Entregado" checked onchange="handleStatusChange('Entregado')" class="hidden">
                                 <i class="fa-solid fa-circle-check text-emerald-400"></i>
                                 <span class="text-xs font-medium text-slate-200">Entregado</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
-                                <input type="radio" name="statusOption" value="Anomalia" class="hidden">
+                                <input type="radio" name="statusOption" value="Anomalia" onchange="handleStatusChange('Anomalia')" class="hidden">
                                 <i class="fa-solid fa-truck-ramp-box text-amber-400"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Anomalía (No Entregado)</span>
+                                <span class="text-xs font-medium text-slate-200 text-center">Anomalía (Sin Cuenta)</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
-                                <input type="radio" name="statusOption" value="Resguardo" class="hidden">
+                                <input type="radio" name="statusOption" value="Resguardo" onchange="handleStatusChange('Resguardo')" class="hidden">
                                 <i class="fa-solid fa-warehouse text-indigo-400"></i>
                                 <span class="text-xs font-medium text-slate-200">En Resguardo</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
-                                <input type="radio" name="statusOption" value="Devolucion" class="hidden">
+                                <input type="radio" name="statusOption" value="Devolucion" onchange="handleStatusChange('Devolucion')" class="hidden">
                                 <i class="fa-solid fa-rotate-left text-rose-400"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Devolución / Rechazado</span>
+                                <span class="text-xs font-medium text-slate-200 text-center">Devolución / Rechazo</span>
                             </label>
                         </div>
                     </div>
@@ -215,18 +243,22 @@
             </div>
         </div>
 
-        <!-- 3. TABLA DE PAQUETES REGISTRADOS -->
+        <!-- 4. BITÁCORA Y ORDEN DE RESGUARDOS -->
         <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-list text-orange-400"></i>
-                        Bitácora General y Estado de Reparto
+                        <i class="fa-solid fa-list-check text-orange-400"></i>
+                        Bitácora General de Paquetes
                     </h2>
-                    <p class="text-xs text-slate-400">Seguimiento de entregas, re-enrutados en ruta y devoluciones.</p>
+                    <p class="text-xs text-slate-400">Pestañas para ver la lista completa o filtrar exclusivamente resguardos ordenados por fecha.</p>
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="text" id="searchInput" oninput="renderPackages()" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 w-full sm:w-64">
+                
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button onclick="setFilterMode('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition">Todos</button>
+                    <button onclick="setFilterMode('resguardo')" id="btnFilterResguardo" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition">Solo Resguardos</button>
+                    
+                    <input type="text" id="searchInput" oninput="renderPackages()" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                     <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
                         <i class="fa-solid fa-file-csv"></i> Exportar
                     </button>
@@ -240,7 +272,7 @@
                             <th class="py-3 px-4">Guía / Tracking</th>
                             <th class="py-3 px-4">Destinatario</th>
                             <th class="py-3 px-4">Teléfono</th>
-                            <th class="py-3 px-4">Plataforma</th>
+                            <th class="py-3 px-4">Fecha Resguardo</th>
                             <th class="py-3 px-4">Cuenta</th>
                             <th class="py-3 px-4">Estado</th>
                             <th class="py-3 px-4 text-right">Acciones</th>
@@ -255,26 +287,19 @@
 
     </main>
 
-    <!-- MODAL DE APERTURA DE TURNO -->
+    <!-- MODAL APERTURA TURNO -->
     <div id="modalStartShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-box-open text-orange-400"></i> Iniciar Nuevo Turno Diario
+                <i class="fa-solid fa-box-open text-orange-400"></i> Iniciar Nuevo Turno
             </h3>
-            <p class="text-xs text-slate-400">Ingresa paquetes nuevos recibidos hoy. Las anomalías no entregadas de ayer se sumarán automáticamente a tu inventario.</p>
-            
-            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 space-y-1">
-                <div class="flex justify-between text-xs text-amber-400">
-                    <span>Anomalías re-enrutadas (ayer):</span>
-                    <span id="modalReroutedCount" class="font-bold">0</span>
-                </div>
-            </div>
+            <p class="text-xs text-slate-400">Ingresa la cantidad de paquetes nuevos recibidos hoy.</p>
 
             <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1">Paquetes Nuevos Recibidos Hoy *</label>
                 <input type="number" id="inputStartAmount" min="0" placeholder="Ej. 200" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
             </div>
-            
+
             <div class="flex justify-end gap-3 pt-2">
                 <button onclick="toggleShiftModal('start')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
                 <button onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
@@ -282,13 +307,13 @@
         </div>
     </div>
 
-    <!-- MODAL DE CIERRE DE TURNO Y CUADRE DE CUENTAS -->
+    <!-- MODAL CIERRE TURNO -->
     <div id="modalEndShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-calculator text-orange-400"></i> Cuadre y Cierre de Turno
             </h3>
-            <p class="text-xs text-slate-400">Ingresa las entregas por cuenta. Las diferencias se registrarán como anomalías para re-enrutar mañana.</p>
+            <p class="text-xs text-slate-400">Ingresa las entregas repartidas por cuenta. Las diferencias pasarán como anomalías para mañana.</p>
             
             <div class="space-y-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700">
                 <div class="flex justify-between text-xs text-slate-300 font-medium">
@@ -317,7 +342,7 @@
                         <span id="closeTotalDelivered" class="font-bold text-emerald-400">0</span>
                     </div>
                     <div class="flex justify-between text-xs text-slate-300">
-                        <span>Anomalías No Entregadas (Pasan a mañana):</span>
+                        <span>Anomalías No Entregadas:</span>
                         <span id="closeAnomalies" class="font-bold text-amber-400">0</span>
                     </div>
                 </div>
@@ -330,7 +355,7 @@
         </div>
     </div>
 
-    <!-- LOGICA JS -->
+    <!-- SCRIPT PRINCIPAL -->
     <script>
         let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
             active: false,
@@ -339,22 +364,135 @@
             damaris: 0,
             oskar: 0,
             zahori: 0,
-            anomalies: 0,
-            devoluciones: 0
+            anomalies: 0
         };
 
         let packages = JSON.parse(localStorage.getItem('oskar_packages_list')) || [];
+        let currentFilter = 'all';
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Establecer fecha de hoy por defecto en el campo de fecha de resguardo
+            document.getElementById('inputResguardoDate').valueAsDate = new Date();
             updateDashUI();
             renderPackages();
             setupOCR();
         });
 
+        // Manejo dinámico de cambio de Estado en Formulario
+        function handleStatusChange(status) {
+            const accountSelect = document.getElementById('inputAccount');
+            if (status === 'Anomalia') {
+                accountSelect.value = '';
+                accountSelect.disabled = true;
+            } else {
+                accountSelect.disabled = false;
+                if (!accountSelect.value) accountSelect.value = 'Damaris';
+            }
+        }
+
+        // BÚSQUEDA HISTÓRICA EN BASE DE DATOS DE RESGUARDOS
+        function searchCustomerDB() {
+            const query = document.getElementById('dbSearchInput').value.trim().toLowerCase();
+            const resultBox = document.getElementById('dbSearchResult');
+
+            if (query.length < 3) {
+                resultBox.classList.add('hidden');
+                return;
+            }
+
+            // Filtrar todos los registros que hayan estado o estén en resguardo
+            const matches = packages.filter(p => 
+                (p.name.toLowerCase().includes(query) || p.phone.includes(query))
+            );
+
+            if (matches.length === 0) {
+                resultBox.innerHTML = `<p class="text-xs text-slate-400">No se encontraron registros de resguardo para este cliente o teléfono.</p>`;
+                resultBox.classList.remove('hidden');
+                return;
+            }
+
+            const activeResguardos = matches.filter(p => p.status === 'Resguardo');
+            const totalResguardosHistoricos = matches.length;
+            const customerName = matches[0].name;
+            const customerPhone = matches[0].phone;
+
+            let html = `
+                <div class="flex justify-between items-start border-b border-slate-700/80 pb-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-white">${customerName}</h4>
+                        <p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-xs mr-1"></i>${customerPhone}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400">Total Paquetes Históricos:</span>
+                        <div class="text-lg font-bold text-orange-400">${totalResguardosHistoricos}</div>
+                    </div>
+                </div>
+            `;
+
+            if (activeResguardos.length > 0) {
+                html += `<div class="space-y-2 pt-1"><p class="text-xs font-semibold text-purple-400"> Paquete(s) Actualmente en Resguardo:</p>`;
+                
+                activeResguardos.forEach(p => {
+                    const resguardoDate = new Date(p.resguardoDate || p.date);
+                    const today = new Date();
+                    const diffTime = Math.abs(today - resguardoDate);
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    html += `
+                        <div class="bg-slate-800/90 p-2.5 rounded-lg border border-purple-500/30 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-mono font-bold text-orange-400">${p.tracking}</span>
+                                <span class="text-slate-400 ml-2">(${p.platform})</span>
+                                <div class="text-[11px] text-slate-300">En resguardo desde: <strong class="text-white">${p.resguardoDate || p.date}</strong></div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                    ${diffDays === 0 ? 'Ingresó Hoy' : `${diffDays} día(s) guardado`}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else {
+                html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes pendientes de recolección en resguardo actualmente.</p>`;
+            }
+
+            // Histórico completo de fechas
+            html += `
+                <div class="pt-2">
+                    <p class="text-[11px] text-slate-400 mb-1">Historial de fechas de paquetes de este cliente:</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        ${matches.map(p => `
+                            <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded-md border border-slate-700">
+                                ${p.resguardoDate \vert{}\vert{} p.date} (${p.status})
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            resultBox.innerHTML = html;
+            resultBox.classList.remove('hidden');
+        }
+
+        function setFilterMode(mode) {
+            currentFilter = mode;
+            const btnAll = document.getElementById('btnFilterAll');
+            const btnResguardo = document.getElementById('btnFilterResguardo');
+
+            if (mode === 'all') {
+                btnAll.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition";
+                btnResguardo.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
+            } else {
+                btnResguardo.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition";
+                btnAll.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
+            }
+            renderPackages();
+        }
+
         function toggleShiftModal(type) {
             if (type === 'start') {
-                const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
-                document.getElementById('modalReroutedCount').innerText = reroutedCount;
                 document.getElementById('modalStartShift').classList.toggle('hidden');
             } else if (type === 'end') {
                 if (!shiftData.active) return;
@@ -369,7 +507,6 @@
             const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
             const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
 
-            // Re-enrutar automáticamente paquetes con anomalías previas
             packages = packages.map(p => {
                 if (p.status === 'Anomalia') {
                     return { ...p, status: 'En Ruta' };
@@ -385,8 +522,7 @@
                 damaris: 0,
                 oskar: 0,
                 zahori: 0,
-                anomalies: 0,
-                devoluciones: packages.filter(p => p.status === 'Devolucion').length
+                anomalies: 0
             };
 
             saveShiftData();
@@ -423,7 +559,7 @@
             saveShiftData();
             toggleShiftModal('end');
             updateDashUI();
-            alert(`Turno cerrado. Total en ruta: ${totalInRoute}. Entregados: ${damaris + oskar + zahori}. Anomalías que re-enrutan mañana: ${shiftData.anomalies}`);
+            alert(`Turno cerrado. Entregados: ${damaris + oskar + zahori}. Anomalías guardadas: ${shiftData.anomalies}`);
         }
 
         function updateDashUI() {
@@ -432,7 +568,9 @@
             document.getElementById('dashDamaris').innerText = shiftData.damaris;
             document.getElementById('dashOskar').innerText = shiftData.oskar;
             document.getElementById('dashZahori').innerText = shiftData.zahori;
-            document.getElementById('dashDevoluciones').innerText = packages.filter(p => p.status === 'Devolucion').length;
+            
+            const activeResguardosCount = packages.filter(p => p.status === 'Resguardo').length;
+            document.getElementById('dashResguardoTotal').innerText = activeResguardosCount;
 
             const dot = document.getElementById('shiftStatusDot');
             const text = document.getElementById('shiftStatusText');
@@ -486,7 +624,7 @@
                                 const progress = Math.round(m.progress * 100);
                                 ocrBar.style.width = `${progress}%`;
                                 document.getElementById('ocrPercent').innerText = `${progress}%`;
-                                ocrStatus.innerText = 'Buscando número de guía...';
+                                ocrStatus.innerText = 'Escaneando etiqueta...';
                             }
                         }
                     });
@@ -512,14 +650,26 @@
                 const trackingFound = trackingMatch[0].toUpperCase();
                 document.getElementById('inputTracking').value = trackingFound;
 
-                // Verificar si es un paquete con anomalía previa para re-enrutar al instante
+                // ESCÁNER DE PAQUETE EN RESGUARDO A ENTREGADO
                 const existingIndex = packages.findIndex(p => p.tracking === trackingFound);
                 if (existingIndex !== -1) {
-                    if (packages[existingIndex].status === 'Anomalia') {
+                    const pkg = packages[existingIndex];
+                    if (pkg.status === 'Resguardo') {
+                        if (confirm(`El paquete ${trackingFound} de ${pkg.name} estaba 'En Resguardo'. ¿Deseas marcarlo como ENTREGADO al cliente en este momento?`)) {
+                            packages[existingIndex].status = 'Entregado';
+                            packages[existingIndex].deliveryDate = new Date().toLocaleDateString();
+                            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+                            renderPackages();
+                            updateDashUI();
+                            alert(`¡Paquete ${trackingFound} marcado como ENTREGADO exitosamente!`);
+                            return;
+                        }
+                    } else if (pkg.status === 'Anomalia') {
                         packages[existingIndex].status = 'En Ruta';
                         localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
                         renderPackages();
-                        alert(`¡Guía ${trackingFound} detectada! Se re-enrutó automáticamente a 'En Ruta'.`);
+                        alert(`Guía ${trackingFound} detectada. Se re-enrutó a 'En Ruta'.`);
+                        return;
                     }
                 }
             }
@@ -547,8 +697,11 @@
             const name = document.getElementById('inputName').value.trim();
             const phone = document.getElementById('inputPhone').value.trim();
             const platform = document.getElementById('inputPlatform').value;
-            const account = document.getElementById('inputAccount').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
+            
+            // Si es anomalía no lleva cuenta
+            const account = status === 'Anomalia' ? 'N/A' : document.getElementById('inputAccount').value;
+            const resguardoDate = document.getElementById('inputResguardoDate').value || new Date().toISOString().split('T')[0];
 
             const existingIndex = packages.findIndex(p => p.tracking === tracking);
 
@@ -560,7 +713,7 @@
                     platform,
                     account,
                     status,
-                    date: new Date().toLocaleDateString()
+                    resguardoDate
                 };
             } else {
                 packages.unshift({
@@ -571,7 +724,8 @@
                     platform,
                     account,
                     status,
-                    date: new Date().toLocaleDateString()
+                    date: new Date().toLocaleDateString(),
+                    resguardoDate
                 });
             }
 
@@ -579,21 +733,32 @@
             renderPackages();
             updateDashUI();
             document.getElementById('packageForm').reset();
+            document.getElementById('inputResguardoDate').valueAsDate = new Date();
             document.getElementById('imagePreview').classList.add('hidden');
+            handleStatusChange('Entregado');
         }
 
         function renderPackages() {
             const body = document.getElementById('packageTableBody');
             const search = document.getElementById('searchInput').value.toLowerCase();
 
-            const filtered = packages.filter(p => 
+            let list = [...packages];
+
+            // Filtrar si está en modo Solo Resgardos
+            if (currentFilter === 'resguardo') {
+                list = list.filter(p => p.status === 'Resguardo');
+                // Ordenar por fecha de resguardo de más antigua a más reciente
+                list.sort((a, b) => new Date(a.resguardoDate || a.date) - new Date(b.resguardoDate || b.date));
+            }
+
+            const filtered = list.filter(p => 
                 p.name.toLowerCase().includes(search) || 
                 p.tracking.toLowerCase().includes(search) || 
                 p.phone.includes(search)
             );
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay registros cargados.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay paquetes que coincidan con el filtro.</td></tr>`;
                 return;
             }
 
@@ -601,11 +766,11 @@
                 let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
                 if (p.status === 'En Ruta') badge = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
                 if (p.status === 'Anomalia') badge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                if (p.status === 'Resguardo') badge = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
+                if (p.status === 'Resguardo') badge = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
                 if (p.status === 'Devolucion') badge = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
 
                 let statusLabel = p.status;
-                if (p.status === 'Anomalia') statusLabel = 'Anomalía (No Entregado)';
+                if (p.status === 'Anomalia') statusLabel = 'Anomalía (Sin Cuenta)';
                 if (p.status === 'En Ruta') statusLabel = 'En Ruta (Re-enrutado)';
                 if (p.status === 'Devolucion') statusLabel = 'Devolución / Rechazado';
 
@@ -614,7 +779,7 @@
                         <td class="py-3 px-4 font-mono text-xs font-bold text-orange-400">${p.tracking}</td>
                         <td class="py-3 px-4 text-slate-100 font-medium">${p.name}</td>
                         <td class="py-3 px-4 text-xs font-mono text-slate-300">${p.phone}</td>
-                        <td class="py-3 px-4 text-xs text-slate-300">${p.platform}</td>
+                        <td class="py-3 px-4 text-xs text-amber-300 font-semibold">${p.resguardoDate || p.date}</td>
                         <td class="py-3 px-4 text-xs text-slate-300 font-semibold">${p.account || 'N/A'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">
@@ -632,7 +797,7 @@
         }
 
         function deletePkg(id) {
-            if (confirm('¿Eliminar este registro?')) {
+            if (confirm('¿Eliminar este paquete del registro?')) {
                 packages = packages.filter(p => p.id !== id);
                 localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
                 renderPackages();
@@ -646,15 +811,15 @@
 
         function exportCSV() {
             if (packages.length === 0) return alert('Sin datos para exportar.');
-            let csv = 'Tracking,Nombre,Telefono,Plataforma,Cuenta,Estado,Fecha\n';
+            let csv = 'Tracking,Nombre,Telefono,Plataforma,FechaResguardo,Cuenta,Estado\n';
             packages.forEach(p => {
-                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.account || ''}","${p.status}","${p.date}"\n`;
+                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.resguardoDate || p.date}","${p.account || ''}","${p.status}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `control_turnos_paquetes.csv`);
+            a.setAttribute('download', `control_paquetes_resguardos.csv`);
             a.click();
         }
     </script>
