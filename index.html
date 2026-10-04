@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Paquetería - Oskar Macías</title>
+    <title>Control de Paquetería y Turnos - Oskar Macías</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tesseract.js para OCR en el cliente -->
+    <!-- Tesseract.js para OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
@@ -17,109 +17,95 @@
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-orange-500 text-white p-2 rounded-xl shadow-lg shadow-orange-500/30">
-                    <i class="fa-solid fa-box-archive text-xl"></i>
+                <div class="bg-orange-500 text-white p-2.5 rounded-xl shadow-lg shadow-orange-500/30">
+                    <i class="fa-solid fa-boxes-packing text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white">Control de Paquetería</h1>
-                    <p class="text-xs text-slate-400">Escáner OCR & Registro Inteligente</p>
+                    <p class="text-xs text-slate-400">Gestión de Turnos, Cuentas & OCR de Guías</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-slate-300 font-medium">Sistema Activo</span>
+            <div id="shiftBadge" class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
+                <span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span id="shiftStatusText" class="text-slate-300 font-medium">Turno CERRADO</span>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- Métricas Principales (KPIs) -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <!-- Total Recibidos -->
-            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
-                <div class="flex justify-between items-start text-slate-400 mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider">Total Recibidos</span>
-                    <i class="fa-solid fa-boxes-packing text-blue-400"></i>
+        <!-- 1. SECCIÓN DE CONTROL DE TURNO Y DESGLOSE POR CUENTAS -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-5">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700/60 pb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
+                        Apertura y Cierre de Turno Diario
+                    </h2>
+                    <p class="text-xs text-slate-400">Registra el total de paquetes recibidos al iniciar y cuadra las entregas por cuenta al finalizar.</p>
                 </div>
-                <div class="text-2xl font-bold text-white" id="kpi-total">0</div>
-                <div class="text-[10px] text-slate-400 mt-1">Paquetes procesados</div>
+                <div class="flex items-center gap-3">
+                    <button id="btnStartShift" onclick="toggleShiftModal('start')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> Iniciar Turno
+                    </button>
+                    <button id="btnEndShift" onclick="toggleShiftModal('end')" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-flag-checkered"></i> Cuadrar y Cerrar Turno
+                    </button>
+                </div>
             </div>
 
-            <!-- Entregado Firmado -->
-            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
-                <div class="flex justify-between items-start text-slate-400 mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider">Firmados</span>
-                    <i class="fa-solid fa-file-signature text-emerald-400"></i>
+            <!-- Resumen Visual del Turno Actual -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs font-medium text-slate-400 uppercase">Recibidos Turno</span>
+                    <div class="text-2xl font-bold text-white mt-1" id="dashReceived">0</div>
                 </div>
-                <div class="text-2xl font-bold text-emerald-400" id="kpi-firmados">0</div>
-                <div class="text-[10px] text-slate-400 mt-1">Entrega confirmada</div>
-            </div>
-
-            <!-- Entregado No Firmado -->
-            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
-                <div class="flex justify-between items-start text-slate-400 mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider">No Firmados</span>
-                    <i class="fa-solid fa-user-check text-sky-400"></i>
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Damaris</span>
+                    <div class="text-2xl font-bold text-sky-400 mt-1" id="dashDamaris">0</div>
                 </div>
-                <div class="text-2xl font-bold text-sky-400" id="kpi-nofirmados">0</div>
-                <div class="text-[10px] text-slate-400 mt-1">Entrega en buzón/tercero</div>
-            </div>
-
-            <!-- Devoluciones -->
-            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition">
-                <div class="flex justify-between items-start text-slate-400 mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider">Devoluciones</span>
-                    <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Oskar</span>
+                    <div class="text-2xl font-bold text-emerald-400 mt-1" id="dashOskar">0</div>
                 </div>
-                <div class="text-2xl font-bold text-amber-400" id="kpi-devoluciones">0</div>
-                <div class="text-[10px] text-slate-400 mt-1">Retornados al almacén</div>
-            </div>
-
-            <!-- Mal Clasificados -->
-            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-sm hover:border-slate-600 transition col-span-2 md:col-span-1">
-                <div class="flex justify-between items-start text-slate-400 mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider">Mal Clasificados</span>
-                    <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Zabori</span>
+                    <div class="text-2xl font-bold text-indigo-400 mt-1" id="dashZabori">0</div>
                 </div>
-                <div class="text-2xl font-bold text-rose-400" id="kpi-malclasificados">0</div>
-                <div class="text-[10px] text-slate-400 mt-1">Error de zona / ruta</div>
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700 col-span-2 md:col-span-1">
+                    <span class="text-xs font-medium text-slate-400 uppercase">Anomalías / Faltantes</span>
+                    <div class="text-2xl font-bold text-amber-400 mt-1" id="dashAnomalies">0</div>
+                </div>
             </div>
         </div>
 
-        <!-- Sección Principal: Captura y Formulario -->
+        <!-- 2. CAPTURA OCR DE PAQUETES / FOTOS DE GUÍAS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Zona de Carga de Imagen y Cámara -->
-            <div class="lg:col-span-5 bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            <!-- Zona de Carga de Imagen -->
+            <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
-                        Escanear Foto de Etiqueta
+                        Escanear Foto de Guía / INE
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Carga una foto o toma una captura desde la cámara para extraer los datos de la guía automáticamente.</p>
+                    <p class="text-xs text-slate-400 mb-4">Sube o toma foto a la guía para extraer los datos del paquete automáticamente.</p>
                     
-                    <!-- Previsualización / Dropzone -->
-                    <div id="dropzone" class="border-2 border-dashed border-slate-600 hover:border-orange-500 rounded-xl p-6 text-center transition cursor-pointer bg-slate-900/50 group relative overflow-hidden min-h-[220px] flex flex-col items-center justify-center">
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 hover:border-orange-500 rounded-xl p-6 text-center transition cursor-pointer bg-slate-900/50 relative overflow-hidden min-h-[200px] flex flex-col items-center justify-center">
                         <input type="file" id="imageInput" accept="image/*" capture="environment" class="hidden">
-                        
                         <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/80 backdrop-blur" alt="Vista previa">
                         
-                        <div id="dropzoneText" class="space-y-3">
-                            <div class="w-14 h-14 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition">
-                                <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                        <div id="dropzoneText" class="space-y-2">
+                            <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                             </div>
-                            <div>
-                                <p class="text-sm font-medium text-slate-200">Haz clic para tomar foto o subir archivo</p>
-                                <p class="text-xs text-slate-400 mt-1">Soporta JPG, PNG, WEBP</p>
-                            </div>
+                            <p class="text-sm font-medium text-slate-200">Tomar foto o cargar desde la galería</p>
                         </div>
                     </div>
 
-                    <!-- Progreso del OCR -->
                     <div id="ocrProgress" class="hidden mt-4 space-y-2">
                         <div class="flex justify-between text-xs text-slate-300 font-medium">
-                            <span id="ocrStatus">Analizando etiqueta...</span>
+                            <span id="ocrStatus">Procesando OCR...</span>
                             <span id="ocrPercent">0%</span>
                         </div>
                         <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -128,148 +114,110 @@
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <button type="button" onclick="document.getElementById('imageInput').click()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                        Seleccionar / Tomar otra Imagen
-                    </button>
-                </div>
+                <button type="button" onclick="document.getElementById('imageInput').click()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-camera-retro"></i> Seleccionar Imagen
+                </button>
             </div>
 
-            <!-- Formulario de Confirmación de Registro -->
-            <div class="lg:col-span-7 bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4">
+            <!-- Formulario de Registro Individual -->
+            <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-orange-400"></i>
-                    Datos Extraídos & Clasificación
+                    <i class="fa-solid fa-pen-to-square text-orange-400"></i>
+                    Registro de Paquete / Estado
                 </h2>
 
                 <form id="packageForm" onsubmit="savePackage(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Número de Seguimiento -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Número de Seguimiento / Guía *</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                    <i class="fa-solid fa-barcode text-xs"></i>
-                                </span>
-                                <input type="text" id="inputTracking" required placeholder="Ej. JMX300992598902" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                            </div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Número de Guía / Tracking *</label>
+                            <input type="text" id="inputTracking" required placeholder="Ej. JMX300992598902" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
-                        <!-- Nombre del Cliente -->
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo *</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                    <i class="fa-solid fa-user text-xs"></i>
-                                </span>
-                                <input type="text" id="inputName" required placeholder="Ej. Mónica Leyva" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                            </div>
+                            <input type="text" id="inputName" required placeholder="Ej. Mónica Leyva" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
-                        <!-- Teléfono -->
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Teléfono *</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                    <i class="fa-solid fa-phone text-xs"></i>
-                                </span>
-                                <input type="tel" id="inputPhone" required placeholder="Ej. 6721095759" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                            </div>
+                            <input type="tel" id="inputPhone" required placeholder="Ej. 6671043785" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
-                        <!-- Plataforma / Tienda -->
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Plataforma / Tienda *</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                    <i class="fa-solid fa-store text-xs"></i>
-                                </span>
-                                <select id="inputPlatform" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
-                                    <option value="SHEIN">SHEIN</option>
-                                    <option value="Temu">Temu</option>
-                                    <option value="TikTok Shop">TikTok Shop</option>
-                                    <option value="Mercado Libre">Mercado Libre</option>
-                                    <option value="Amazon">Amazon</option>
-                                    <option value="Otra">Otra</option>
-                                </select>
-                            </div>
+                            <select id="inputPlatform" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                                <option value="J&T Express">J&T Express</option>
+                                <option value="SHEIN">SHEIN</option>
+                                <option value="Temu">Temu</option>
+                                <option value="TikTok Shop">TikTok Shop</option>
+                                <option value="Mercado Libre">Mercado Libre</option>
+                                <option value="Amazon">Amazon</option>
+                                <option value="Otra">Otra</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Clasificación / Estado Obligatorio -->
+                    <!-- Clasificación / Tipo de Registro -->
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Paquete / Clasificación *</label>
+                        <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Registro *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-                                <input type="radio" name="statusOption" value="Firmado" checked class="hidden">
-                                <i class="fa-solid fa-file-signature text-emerald-400 text-lg"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Firmado</span>
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+                                <input type="radio" name="statusOption" value="Entregado" checked class="hidden">
+                                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                                <span class="text-xs font-medium text-slate-200">Entregado</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-sky-500 transition has-[:checked]:border-sky-500 has-[:checked]:bg-sky-950/30">
-                                <input type="radio" name="statusOption" value="No Firmado" class="hidden">
-                                <i class="fa-solid fa-user-check text-sky-400 text-lg"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">No Firmado</span>
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
+                                <input type="radio" name="statusOption" value="Resguardo" class="hidden">
+                                <i class="fa-solid fa-warehouse text-indigo-400"></i>
+                                <span class="text-xs font-medium text-slate-200">En Resguardo</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
+                                <input type="radio" name="statusOption" value="Faltante" class="hidden">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                                <span class="text-xs font-medium text-slate-200">Faltante / Anomalía</span>
+                            </label>
+
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
                                 <input type="radio" name="statusOption" value="Devolucion" class="hidden">
-                                <i class="fa-solid fa-rotate-left text-amber-400 text-lg"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Devolución</span>
-                            </label>
-
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1.5 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
-                                <input type="radio" name="statusOption" value="Mal Clasificado" class="hidden">
-                                <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Mal Clasificado</span>
+                                <i class="fa-solid fa-rotate-left text-rose-400"></i>
+                                <span class="text-xs font-medium text-slate-200">Devolución</span>
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus-circle"></i>
-                        Guardar Paquete en el Registro
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Guardar Paquete en Bitácora
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Tabla de Registros e Historial -->
-        <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 shadow-sm space-y-4">
+        <!-- 3. TABLA DE PAQUETES REGISTRADOS -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-boxes-stacked text-orange-400"></i>
-                        Historial de Paquetes
+                        <i class="fa-solid fa-list text-orange-400"></i>
+                        Bitácora General de Paquetes
                     </h2>
-                    <p class="text-xs text-slate-400">Registro detallado con búsqueda y filtrado por estado.</p>
+                    <p class="text-xs text-slate-400">Registro histórico de entregas, resguardos y faltantes.</p>
                 </div>
-
-                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <!-- Buscador -->
-                    <div class="relative flex-1 sm:w-64">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
-                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar por cliente o guía..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                    </div>
-
-                    <!-- Exportar CSV -->
-                    <button onclick="exportToCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-csv"></i>
-                        Exportar
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <input type="text" id="searchInput" oninput="renderPackages()" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 w-full sm:w-64">
+                    <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
                     </button>
                 </div>
             </div>
 
-            <!-- Tabla Responsiva -->
             <div class="overflow-x-auto rounded-xl border border-slate-700">
                 <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                    <thead class="bg-slate-900 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
                         <tr>
-                            <th class="py-3 px-4">Nº Seguimiento</th>
-                            <th class="py-3 px-4">Nombre Destinatario</th>
+                            <th class="py-3 px-4">Guía / Tracking</th>
+                            <th class="py-3 px-4">Destinatario</th>
                             <th class="py-3 px-4">Teléfono</th>
                             <th class="py-3 px-4">Plataforma</th>
                             <th class="py-3 px-4">Estado</th>
@@ -285,28 +233,197 @@
 
     </main>
 
-    <!-- Script de Lógica del Negocio -->
-    <script>
-        // Array principal de datos (Persistente en localStorage)
-        let packages = JSON.parse(localStorage.getItem('oskar_packages_data')) || [
-            {
-                id: '1',
-                tracking: 'JMX300992598902',
-                name: 'Mónica Leyva',
-                phone: '6721095759',
-                platform: 'SHEIN',
-                status: 'Firmado',
-                date: new Date().toISOString()
-            }
-        ];
+    <!-- MODAL DE APERTURA DE TURNO -->
+    <div id="modalStartShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-box-open text-orange-400"></i> Iniciar Nuevo Turno Diario
+            </h3>
+            <p class="text-xs text-slate-400">Ingresa la cantidad total de paquetes que llegaron a recolección al abrir la jornada.</p>
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Cantidad de Paquetes Recibidos *</label>
+                <input type="number" id="inputStartAmount" min="1" placeholder="Ej. 200" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="toggleShiftModal('start')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
+                <button onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
+            </div>
+        </div>
+    </div>
 
-        // Inicializar aplicación
+    <!-- MODAL DE CIERRE DE TURNO Y CUADRE DE CUENTAS -->
+    <div id="modalEndShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-orange-400"></i> Cuadre y Cierre de Turno
+            </h3>
+            <p class="text-xs text-slate-400">Ingresa las entregas realizadas repartidas entre tus diferentes cuentas.</p>
+            
+            <div class="space-y-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                <div class="flex justify-between text-xs text-slate-300 font-medium">
+                    <span>Paquetes Recibidos:</span>
+                    <span id="closeTotalReceived" class="font-bold text-white">0</span>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-medium text-sky-400 mb-1">Entregados Cuenta Damaris</label>
+                        <input type="number" id="closeDamaris" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-emerald-400 mb-1">Entregados Cuenta Oskar</label>
+                        <input type="number" id="closeOskar" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-indigo-400 mb-1">Entregados Cuenta Zabori</label>
+                        <input type="number" id="closeZabori" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-700 pt-3 space-y-1">
+                    <div class="flex justify-between text-xs text-slate-300">
+                        <span>Total Entregados:</span>
+                        <span id="closeTotalDelivered" class="font-bold text-emerald-400">0</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-300">
+                        <span>Faltantes / Anomalías:</span>
+                        <span id="closeAnomalies" class="font-bold text-amber-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso si hay faltantes -->
+            <div id="anomalyWarning" class="hidden bg-amber-950/40 border border-amber-700/60 p-3 rounded-xl text-xs text-amber-200">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Detectamos faltantes en el cuadre. Asegúrate de tomar foto a las guías de los paquetes faltantes para mantener tu registro en orden.
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="toggleShiftModal('end')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
+                <button onclick="confirmEndShift()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGICA JS -->
+    <script>
+        // Estado local persistente
+        let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
+            active: false,
+            received: 0,
+            damaris: 0,
+            oskar: 0,
+            zabori: 0,
+            anomalies: 0
+        };
+
+        let packages = JSON.parse(localStorage.getItem('oskar_packages_list')) || [];
+
         document.addEventListener('DOMContentLoaded', () => {
+            updateDashUI();
             renderPackages();
             setupOCR();
         });
 
-        // Configuración de OCR para extracción automática desde la imagen
+        // Alternar vistas de modales
+        function toggleShiftModal(type) {
+            if (type === 'start') {
+                document.getElementById('modalStartShift').classList.toggle('hidden');
+            } else if (type === 'end') {
+                if (!shiftData.active) return;
+                document.getElementById('closeTotalReceived').innerText = shiftData.received;
+                calculateBalance();
+                document.getElementById('modalEndShift').classList.toggle('hidden');
+            }
+        }
+
+        // Confirmar inicio de turno
+        function confirmStartShift() {
+            const amount = parseInt(document.getElementById('inputStartAmount').value);
+            if (!amount || amount <= 0) return alert('Ingresa un número válido de paquetes.');
+
+            shiftData = {
+                active: true,
+                received: amount,
+                damaris: 0,
+                oskar: 0,
+                zabori: 0,
+                anomalies: 0
+            };
+
+            saveShiftData();
+            toggleShiftModal('start');
+            updateDashUI();
+        }
+
+        // Calcular balances en modal de cierre
+        function calculateBalance() {
+            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
+            const zabori = parseInt(document.getElementById('closeZabori').value) || 0;
+
+            const totalDelivered = damaris + oskar + zabori;
+            const anomalies = Math.max(0, shiftData.received - totalDelivered);
+
+            document.getElementById('closeTotalDelivered').innerText = totalDelivered;
+            document.getElementById('closeAnomalies').innerText = anomalies;
+
+            const anomalyWarning = document.getElementById('anomalyWarning');
+            if (anomalies > 0) {
+                anomalyWarning.classList.remove('hidden');
+            } else {
+                anomalyWarning.classList.add('hidden');
+            }
+        }
+
+        // Confirmar cierre de turno
+        function confirmEndShift() {
+            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
+            const zabori = parseInt(document.getElementById('closeZabori').value) || 0;
+
+            shiftData.damaris = damaris;
+            shiftData.oskar = oskar;
+            shiftData.zabori = zabori;
+            shiftData.anomalies = Math.max(0, shiftData.received - (damaris + oskar + zabori));
+            shiftData.active = false;
+
+            saveShiftData();
+            toggleShiftModal('end');
+            updateDashUI();
+            alert(`Turno cerrado con éxito. Total entregados: ${damaris + oskar + zabori}. Faltantes: ${shiftData.anomalies}`);
+        }
+
+        // Actualizar interfaz del tablero de turno
+        function updateDashUI() {
+            document.getElementById('dashReceived').innerText = shiftData.received;
+            document.getElementById('dashDamaris').innerText = shiftData.damaris;
+            document.getElementById('dashOskar').innerText = shiftData.oskar;
+            document.getElementById('dashZabori').innerText = shiftData.zabori;
+            document.getElementById('dashAnomalies').innerText = shiftData.anomalies;
+
+            const dot = document.getElementById('shiftStatusDot');
+            const text = document.getElementById('shiftStatusText');
+            const btnStart = document.getElementById('btnStartShift');
+            const btnEnd = document.getElementById('btnEndShift');
+
+            if (shiftData.active) {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+                text.innerText = 'Turno ACTIVO';
+                btnStart.classList.add('opacity-50', 'cursor-not-allowed');
+                btnStart.disabled = true;
+                btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnEnd.disabled = false;
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                text.innerText = 'Turno CERRADO';
+                btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnStart.disabled = false;
+                btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
+                btnEnd.disabled = true;
+            }
+        }
+
+        // Configuración OCR
         function setupOCR() {
             const imageInput = document.getElementById('imageInput');
             const dropzone = document.getElementById('dropzone');
@@ -317,7 +434,6 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                // Mostrar previsualización
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const imgPreview = document.getElementById('imagePreview');
@@ -326,7 +442,6 @@
                 };
                 reader.readAsDataURL(file);
 
-                // Iniciar reconocimiento OCR
                 const ocrProgress = document.getElementById('ocrProgress');
                 const ocrBar = document.getElementById('ocrBar');
                 const ocrStatus = document.getElementById('ocrStatus');
@@ -336,14 +451,13 @@
 
                 try {
                     const worker = await Tesseract.createWorker('spa');
-                    
                     worker.setParameters({
                         logger: m => {
                             if (m.status === 'recognizing text') {
                                 const progress = Math.round(m.progress * 100);
                                 ocrBar.style.width = `${progress}%`;
                                 ocrPercent.innerText = `${progress}%`;
-                                ocrStatus.innerText = 'Extrayendo texto de la guía...';
+                                ocrStatus.innerText = 'Procesando texto de guía...';
                             }
                         }
                     });
@@ -351,53 +465,39 @@
                     const { data: { text } } = await worker.recognize(file);
                     await worker.terminate();
 
-                    ocrStatus.innerText = '¡Extracción completada!';
+                    ocrStatus.innerText = '¡OCR Completado!';
                     parseOCRText(text);
-
-                } catch (error) {
-                    console.error('Error OCR:', error);
-                    ocrStatus.innerText = 'Error al leer imagen. Ingresa manualmente.';
-                } finally {
-                    setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
-                }
+                } catch (err) {
+                    console.error(err);
+                    ocrStatus.innerText = 'Error al leer imagen. Ingresa los datos manualmente.';
+                } setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
             });
         }
 
-        // Analizador sintáctico para extraer los datos requeridos
+        // Analizar texto OCR
         function parseOCRText(text) {
-            console.log("Texto detectado:", text);
-
-            // 1. Extraer Tracking / Número de Guía
             const trackingMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
-            if (trackingMatch) {
-                document.getElementById('inputTracking').value = trackingMatch[0].toUpperCase();
-            }
+            if (trackingMatch) document.getElementById('inputTracking').value = trackingMatch[0].toUpperCase();
 
-            // 2. Extraer Nombre
             const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
-            if (nameMatch) {
-                document.getElementById('inputName').value = nameMatch[1].trim();
-            }
+            if (nameMatch) document.getElementById('inputName').value = nameMatch[1].trim();
 
-            // 3. Extraer Teléfono
             const phoneMatch = text.match(/\b(\d{10}|\d{3}[\s-]?\d{3}[\s-]?\d{4})\b/);
-            if (phoneMatch) {
-                document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
-            }
+            if (phoneMatch) document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
 
-            // 4. Identificar Plataforma
-            const upperText = text.toUpperCase();
-            const platformSelect = document.getElementById('inputPlatform');
-            if (upperText.includes('SHEIN')) platformSelect.value = 'SHEIN';
-            else if (upperText.includes('TEMU')) platformSelect.value = 'Temu';
-            else if (upperText.includes('TIKTOK')) platformSelect.value = 'TikTok Shop';
-            else if (upperText.includes('MERCADO')) platformSelect.value = 'Mercado Libre';
-            else if (upperText.includes('AMAZON')) platformSelect.value = 'Amazon';
+            const upper = text.toUpperCase();
+            const platform = document.getElementById('inputPlatform');
+            if (upper.includes('J&T')) platform.value = 'J&T Express';
+            else if (upper.includes('SHEIN')) platform.value = 'SHEIN';
+            else if (upper.includes('TEMU')) platform.value = 'Temu';
+            else if (upper.includes('TIKTOK')) platform.value = 'TikTok Shop';
+            else if (upper.includes('MERCADO')) platform.value = 'Mercado Libre';
+            else if (upper.includes('AMAZON')) platform.value = 'Amazon';
         }
 
-        // Guardar nuevo paquete
-        function savePackage(event) {
-            event.preventDefault();
+        // Guardar paquete en la lista
+        function savePackage(e) {
+            e.preventDefault();
 
             const tracking = document.getElementById('inputTracking').value.trim();
             const name = document.getElementById('inputName').value.trim();
@@ -405,103 +505,57 @@
             const platform = document.getElementById('inputPlatform').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
 
-            const newPackage = {
+            packages.unshift({
                 id: Date.now().toString(),
                 tracking,
                 name,
                 phone,
                 platform,
                 status,
-                date: new Date().toISOString()
-            };
+                date: new Date().toLocaleDateString()
+            });
 
-            packages.unshift(newPackage);
-            saveAndRefresh();
-
-            // Limpiar formulario
+            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+            renderPackages();
             document.getElementById('packageForm').reset();
             document.getElementById('imagePreview').classList.add('hidden');
         }
 
-        // Cambiar estado
-        function updateStatus(id, newStatus) {
-            packages = packages.map(p => p.id === id ? { ...p, status: newStatus } : p);
-            saveAndRefresh();
-        }
-
-        // Eliminar paquete
-        function deletePackage(id) {
-            if (confirm('¿Deseas eliminar este registro de paquete?')) {
-                packages = packages.filter(p => p.id !== id);
-                saveAndRefresh();
-            }
-        }
-
-        // Guardar en LocalStorage y renderizar
-        function saveAndRefresh() {
-            localStorage.setItem('oskar_packages_data', JSON.stringify(packages));
-            renderPackages();
-        }
-
-        // Renderizar Métricas y Tabla
+        // Renderizar tabla
         function renderPackages() {
-            const tableBody = document.getElementById('packageTableBody');
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const body = document.getElementById('packageTableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
 
-            // Calcular KPIs
-            const total = packages.length;
-            const firmados = packages.filter(p => p.status === 'Firmado').length;
-            const nofirmados = packages.filter(p => p.status === 'No Firmado').length;
-            const devoluciones = packages.filter(p => p.status === 'Devolucion').length;
-            const malclasificados = packages.filter(p => p.status === 'Mal Clasificado').length;
-
-            document.getElementById('kpi-total').innerText = total;
-            document.getElementById('kpi-firmados').innerText = firmados;
-            document.getElementById('kpi-nofirmados').innerText = nofirmados;
-            document.getElementById('kpi-devoluciones').innerText = devoluciones;
-            document.getElementById('kpi-malclasificados').innerText = malclasificados;
-
-            // Filtrar tabla
             const filtered = packages.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.tracking.toLowerCase().includes(query) ||
-                p.phone.includes(query)
+                p.name.toLowerCase().includes(search) || 
+                p.tracking.toLowerCase().includes(search) || 
+                p.phone.includes(search)
             );
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="py-8 text-center text-slate-500 text-xs">
-                            No hay paquetes registrados que coincidan con la búsqueda.
-                        </td>
-                    </tr>
-                `;
+                body.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-xs text-slate-500">No hay registros cargados.</td></tr>`;
                 return;
             }
 
-            tableBody.innerHTML = filtered.map(p => {
-                let badgeClass = '';
-                if (p.status === 'Firmado') badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                else if (p.status === 'No Firmado') badgeClass = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
-                else if (p.status === 'Devolucion') badgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                else if (p.status === 'Mal Clasificado') badgeClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+            body.innerHTML = filtered.map(p => {
+                let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                if (p.status === 'Resguardo') badge = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
+                if (p.status === 'Faltante') badge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                if (p.status === 'Devolucion') badge = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
 
                 return `
-                    <tr class="hover:bg-slate-800/50 transition">
-                        <td class="py-3 px-4 font-mono text-xs font-semibold text-orange-400">${p.tracking}</td>
-                        <td class="py-3 px-4 font-medium text-slate-100">${p.name}</td>
+                    <tr class="hover:bg-slate-800/40 transition">
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-orange-400">${p.tracking}</td>
+                        <td class="py-3 px-4 text-slate-100 font-medium">${p.name}</td>
                         <td class="py-3 px-4 text-xs font-mono text-slate-300">${p.phone}</td>
                         <td class="py-3 px-4 text-xs text-slate-300">${p.platform}</td>
                         <td class="py-3 px-4">
-                            <select onchange="updateStatus('${p.id}', this.value)" class="bg-slate-900 text-xs border border-slate-700 rounded-lg py-1 px-2 focus:outline-none ${badgeClass}">
-                                <option value="Firmado" ${p.status === 'Firmado' ? 'selected' : ''}>Firmado</option>
-                                <option value="No Firmado" ${p.status === 'No Firmado' ? 'selected' : ''}>No Firmado</option>
-                                <option value="Devolucion" ${p.status === 'Devolucion' ? 'selected' : ''}>Devolución</option>
-                                <option value="Mal Clasificado" ${p.status === 'Mal Clasificado' ? 'selected' : ''}>Mal Clasificado</option>
-                            </select>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">
+                                ${p.status}
+                            </span>
                         </td>
                         <td class="py-3 px-4 text-right">
-                            <button onclick="deletePackage('${p.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg transition" title="Eliminar">
+                            <button onclick="deletePkg('${p.id}')" class="text-slate-500 hover:text-rose-400 transition">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
@@ -510,14 +564,20 @@
             }).join('');
         }
 
-        // Filtro rápido por campo de texto
-        function filterTable() {
-            renderPackages();
+        function deletePkg(id) {
+            if (confirm('¿Eliminar este registro?')) {
+                packages = packages.filter(p => p.id !== id);
+                localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+                renderPackages();
+            }
         }
 
-        // Exportación de datos a CSV
-        function exportToCSV() {
-            if (packages.length === 0) return alert('No hay datos para exportar');
+        function saveShiftData() {
+            localStorage.setItem('oskar_shift_data', JSON.stringify(shiftData));
+        }
+
+        function exportCSV() {
+            if (packages.length === 0) return alert('Sin datos para exportar.');
             let csv = 'Tracking,Nombre,Telefono,Plataforma,Estado,Fecha\n';
             packages.forEach(p => {
                 csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.status}","${p.date}"\n`;
@@ -526,7 +586,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `control_paqueteria_${new Date().toISOString().slice(0,10)}.csv`);
+            a.setAttribute('download', `control_turnos_paquetes.csv`);
             a.click();
         }
     </script>
