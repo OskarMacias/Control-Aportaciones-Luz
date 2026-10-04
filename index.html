@@ -45,10 +45,10 @@
                     <p class="text-xs text-slate-400">Control diario de volumen, cuadre por cuenta y anomalías pendientes de enrutar.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="btnStartShift" onclick="toggleShiftModal('start')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
+                    <button id="btnStartShift" type="button" onclick="openStartShiftModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 active:scale-95">
                         <i class="fa-solid fa-play"></i> Iniciar Turno
                     </button>
-                    <button id="btnEndShift" onclick="toggleShiftModal('end')" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    <button id="btnEndShift" type="button" onclick="openEndShiftModal()" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
                         <i class="fa-solid fa-flag-checkered"></i> Cuadrar y Cerrar Turno
                     </button>
                 </div>
@@ -101,7 +101,7 @@
             </div>
 
             <div id="dbSearchResult" class="hidden bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
-                <!-- Resultado dinámico de la búsqueda -->
+                <!-- Resultado dinámico -->
             </div>
         </div>
 
@@ -198,7 +198,6 @@
                             </select>
                         </div>
 
-                        <!-- Campo de Fecha Personalizada para Resguardos Previos -->
                         <div>
                             <label class="block text-xs font-medium text-amber-400 mb-1">Fecha de Entrada a Resguardo</label>
                             <input type="date" id="inputResguardoDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
@@ -301,8 +300,8 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button onclick="toggleShiftModal('start')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
-                <button onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
+                <button type="button" onclick="closeStartShiftModal()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
+                <button type="button" onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
             </div>
         </div>
     </div>
@@ -349,15 +348,14 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button onclick="toggleShiftModal('end')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
-                <button onclick="confirmEndShift()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
+                <button type="button" onclick="closeEndShiftModal()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
+                <button type="button" onclick="confirmEndShift()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
             </div>
         </div>
     </div>
 
     <!-- SCRIPT PRINCIPAL -->
     <script>
-        // Inicialización totalmente limpia sin datos antiguos
         let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
             active: false,
             newReceived: 0,
@@ -377,6 +375,27 @@
             renderPackages();
             setupOCR();
         });
+
+        // FUNCIONES DE CONTROL DE MODALES DIRECTOS
+        function openStartShiftModal() {
+            document.getElementById('modalStartShift').classList.remove('hidden');
+        }
+
+        function closeStartShiftModal() {
+            document.getElementById('modalStartShift').classList.add('hidden');
+        }
+
+        function openEndShiftModal() {
+            if (!shiftData.active) return;
+            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
+            document.getElementById('closeTotalReceived').innerText = totalInRoute;
+            calculateBalance();
+            document.getElementById('modalEndShift').classList.remove('hidden');
+        }
+
+        function closeEndShiftModal() {
+            document.getElementById('modalEndShift').classList.add('hidden');
+        }
 
         function handleStatusChange(status) {
             const accountSelect = document.getElementById('inputAccount');
@@ -487,18 +506,6 @@
             renderPackages();
         }
 
-        function toggleShiftModal(type) {
-            if (type === 'start') {
-                document.getElementById('modalStartShift').classList.toggle('hidden');
-            } else if (type === 'end') {
-                if (!shiftData.active) return;
-                const totalInRoute = shiftData.newReceived + shiftData.rerouted;
-                document.getElementById('closeTotalReceived').innerText = totalInRoute;
-                calculateBalance();
-                document.getElementById('modalEndShift').classList.toggle('hidden');
-            }
-        }
-
         function confirmStartShift() {
             const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
             const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
@@ -522,7 +529,7 @@
             };
 
             saveShiftData();
-            toggleShiftModal('start');
+            closeStartShiftModal();
             updateDashUI();
             renderPackages();
         }
@@ -553,7 +560,7 @@
             shiftData.active = false;
 
             saveShiftData();
-            toggleShiftModal('end');
+            closeEndShiftModal();
             updateDashUI();
             alert(`Turno cerrado. Entregados: ${damaris + oskar + zahori}. Anomalías guardadas: ${shiftData.anomalies}`);
         }
