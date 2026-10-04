@@ -357,6 +357,7 @@
 
     <!-- SCRIPT PRINCIPAL -->
     <script>
+        // Inicialización totalmente limpia sin datos antiguos
         let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
             active: false,
             newReceived: 0,
@@ -371,14 +372,12 @@
         let currentFilter = 'all';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Establecer fecha de hoy por defecto en el campo de fecha de resguardo
             document.getElementById('inputResguardoDate').valueAsDate = new Date();
             updateDashUI();
             renderPackages();
             setupOCR();
         });
 
-        // Manejo dinámico de cambio de Estado en Formulario
         function handleStatusChange(status) {
             const accountSelect = document.getElementById('inputAccount');
             if (status === 'Anomalia') {
@@ -390,7 +389,6 @@
             }
         }
 
-        // BÚSQUEDA HISTÓRICA EN BASE DE DATOS DE RESGUARDOS
         function searchCustomerDB() {
             const query = document.getElementById('dbSearchInput').value.trim().toLowerCase();
             const resultBox = document.getElementById('dbSearchResult');
@@ -400,7 +398,6 @@
                 return;
             }
 
-            // Filtrar todos los registros que hayan estado o estén en resguardo
             const matches = packages.filter(p => 
                 (p.name.toLowerCase().includes(query) || p.phone.includes(query))
             );
@@ -458,7 +455,6 @@
                 html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes pendientes de recolección en resguardo actualmente.</p>`;
             }
 
-            // Histórico completo de fechas
             html += `
                 <div class="pt-2">
                     <p class="text-[11px] text-slate-400 mb-1">Historial de fechas de paquetes de este cliente:</p>
@@ -650,7 +646,6 @@
                 const trackingFound = trackingMatch[0].toUpperCase();
                 document.getElementById('inputTracking').value = trackingFound;
 
-                // ESCÁNER DE PAQUETE EN RESGUARDO A ENTREGADO
                 const existingIndex = packages.findIndex(p => p.tracking === trackingFound);
                 if (existingIndex !== -1) {
                     const pkg = packages[existingIndex];
@@ -699,7 +694,6 @@
             const platform = document.getElementById('inputPlatform').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
             
-            // Si es anomalía no lleva cuenta
             const account = status === 'Anomalia' ? 'N/A' : document.getElementById('inputAccount').value;
             const resguardoDate = document.getElementById('inputResguardoDate').value || new Date().toISOString().split('T')[0];
 
@@ -744,10 +738,8 @@
 
             let list = [...packages];
 
-            // Filtrar si está en modo Solo Resgardos
             if (currentFilter === 'resguardo') {
                 list = list.filter(p => p.status === 'Resguardo');
-                // Ordenar por fecha de resguardo de más antigua a más reciente
                 list.sort((a, b) => new Date(a.resguardoDate || a.date) - new Date(b.resguardoDate || b.date));
             }
 
@@ -758,7 +750,7 @@
             );
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay paquetes que coincidan con el filtro.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay paquetes cargados. Empieza a registrar nuevos paquetes.</td></tr>`;
                 return;
             }
 
