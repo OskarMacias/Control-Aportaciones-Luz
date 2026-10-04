@@ -88,7 +88,7 @@
             </div>
         </section>
 
-        <!-- 2. SECCIÓN: BUSCADOR HISTÓRICO DE CLIENTES Y GUÍAS (CON ESCÁNER CONECTADO) -->
+        <!-- 2. SECCIÓN: BUSCADOR HISTÓRICO DE CLIENTES Y GUÍAS -->
         <section class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
             <div>
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -181,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- Formulario de Registro -->
+            <!-- Formulario de Registro Simplificado -->
             <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-orange-400"></i>
@@ -203,28 +203,6 @@
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Teléfono *</label>
                             <input type="tel" id="inputPhone" required placeholder="Ej. 6671043785" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Plataforma *</label>
-                            <select id="inputPlatform" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
-                                <option value="J&T Express">J&T Express</option>
-                                <option value="SHEIN">SHEIN</option>
-                                <option value="Temu">Temu</option>
-                                <option value="TikTok Shop">TikTok Shop</option>
-                                <option value="Mercado Libre">Mercado Libre</option>
-                                <option value="Amazon">Amazon</option>
-                                <option value="Otra">Otra</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Cuenta Asignada</label>
-                            <select id="inputAccount" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
-                                <option value="Damaris">Damaris</option>
-                                <option value="Oskar">Oskar</option>
-                                <option value="Zahori">Zahori</option>
-                            </select>
                         </div>
 
                         <div>
@@ -300,7 +278,6 @@
                             <th class="py-3 px-4">Destinatario</th>
                             <th class="py-3 px-4">Teléfono</th>
                             <th class="py-3 px-4">Fecha Resguardo</th>
-                            <th class="py-3 px-4">Cuenta</th>
                             <th class="py-3 px-4">Estado</th>
                             <th class="py-3 px-4 text-right">Acción</th>
                         </tr>
@@ -468,20 +445,6 @@
             // Formulario
             document.getElementById('pkgForm').onsubmit = guardarPaqueteAction;
 
-            // Radios de estado
-            document.querySelectorAll('input[name="statusOption"]').forEach(r => {
-                r.onchange = (e) => {
-                    const acc = document.getElementById('inputAccount');
-                    if (e.target.value === 'Anomalia') {
-                        acc.value = '';
-                        acc.disabled = true;
-                    } else {
-                        acc.disabled = false;
-                        if (!acc.value) acc.value = 'Damaris';
-                    }
-                };
-            });
-
             setupOCR();
             setupSearchOCR();
             refreshUI();
@@ -561,9 +524,9 @@
             const tracking = document.getElementById('inputTracking').value.trim().toUpperCase();
             const name = document.getElementById('inputName').value.trim();
             const phone = document.getElementById('inputPhone').value.trim();
-            const platform = document.getElementById('inputPlatform').value;
+            const platform = "J&T Express";
             const status = document.querySelector('input[name="statusOption"]:checked').value;
-            const account = status === 'Anomalia' ? 'N/A' : document.getElementById('inputAccount').value;
+            const account = "N/A";
             const resguardoDate = document.getElementById('inputResguardoDate').value || new Date().toISOString().split('T')[0];
 
             const idx = AppState.packages.findIndex(p => p.tracking === tracking);
@@ -661,7 +624,7 @@
             );
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">Sin paquetes guardados.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-xs text-slate-500">Sin paquetes guardados.</td></tr>`;
                 return;
             }
 
@@ -678,7 +641,6 @@
                         <td class="py-3 px-4 text-slate-100 font-medium">${p.name}</td>
                         <td class="py-3 px-4 text-xs font-mono text-slate-300">${p.phone}</td>
                         <td class="py-3 px-4 text-xs text-amber-300 font-semibold">${p.resguardoDate || p.date}</td>
-                        <td class="py-3 px-4 text-xs text-slate-300 font-semibold">${p.account || 'N/A'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badgeClass}">
                                 ${p.status}
@@ -702,7 +664,7 @@
             }
         }
 
-        // BÚSQUEDA HISTÓRICA POR CLIENTE, TELÉFONO O GUÍA
+        // BÚSQUEDA HISTÓRICA
         function buscarClienteDB() {
             const q = document.getElementById('dbSearchInput').value.trim().toLowerCase();
             const box = document.getElementById('dbSearchResult');
@@ -724,7 +686,6 @@
                 return;
             }
 
-            // Si la búsqueda coincide exactamente con una guía
             const exactTrackingMatch = matches.find(p => p.tracking.toLowerCase() === q);
 
             let html = '';
@@ -747,8 +708,6 @@
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div><span class="text-slate-400">Destinatario:</span> <strong class="text-white">${p.name}</strong></div>
                             <div><span class="text-slate-400">Teléfono:</span> <strong class="text-slate-200">${p.phone}</strong></div>
-                            <div><span class="text-slate-400">Plataforma:</span> <strong class="text-slate-200">${p.platform}</strong></div>
-                            <div><span class="text-slate-400">Cuenta:</span> <strong class="text-slate-200">${p.account || 'N/A'}</strong></div>
                             <div class="col-span-2 text-amber-300">
                                 <span>Ingresó / Resguardo:</span> <strong>${p.resguardoDate || p.date}</strong> 
                                 ${p.status === 'Resguardo' ? `(${diffDays === 0 ? 'Hoy' : diffDays + ' día(s) en almacén'})` : ''}
@@ -786,7 +745,6 @@
                         <div class="bg-slate-800/90 p-2.5 rounded-lg border border-purple-500/30 flex justify-between items-center text-xs">
                             <div>
                                 <span class="font-mono font-bold text-orange-400">${p.tracking}</span>
-                                <span class="text-slate-400 ml-2">(${p.platform})</span>
                                 <div class="text-[11px] text-slate-300">Desde: <strong class="text-white">${p.resguardoDate || p.date}</strong></div>
                             </div>
                             <span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
@@ -815,7 +773,7 @@
             box.classList.remove('hidden');
         }
 
-        // ESCÁNER OCR EN EL BUSCADOR HISTÓRICO
+        // ESCÁNER OCR BUSCADOR
         function setupSearchOCR() {
             const cam = document.getElementById('searchCamInput');
             const gal = document.getElementById('searchGalInput');
@@ -838,7 +796,7 @@
                                 const val = Math.round(m.progress * 100);
                                 bar.style.width = `${val}%`;
                                 document.getElementById('searchOcrPercent').innerText = `${val}%`;
-                                status.innerText = 'Escaneando etiqueta en buscador...';
+                                status.innerText = 'Escaneando etiqueta...';
                             }
                         }
                     });
@@ -854,7 +812,7 @@
                         document.getElementById('dbSearchInput').value = tracking;
                         buscarClienteDB();
                     } else {
-                        alert("No se identificó un número de guía claro. Ingrésalo manualmente.");
+                        alert("No se identificó un número de guía claro.");
                     }
 
                 } catch (err) {
@@ -867,7 +825,7 @@
             gal.onchange = handleSearchFile;
         }
 
-        // ESCÁNER OCR PARA EL FORMULARIO DE REGISTRO
+        // ESCÁNER OCR REGISTRO
         function setupOCR() {
             const cam = document.getElementById('inputCam');
             const gal = document.getElementById('inputGal');
@@ -945,9 +903,9 @@
 
         function exportarCSV() {
             if (AppState.packages.length === 0) return alert('No hay datos para exportar.');
-            let csv = 'Tracking,Nombre,Telefono,Plataforma,FechaResguardo,Cuenta,Estado\n';
+            let csv = 'Tracking,Nombre,Telefono,Plataforma,FechaResguardo,Estado\n';
             AppState.packages.forEach(p => {
-                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.resguardoDate || p.date}","${p.account || ''}","${p.status}"\n`;
+                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.resguardoDate || p.date}","${p.status}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
