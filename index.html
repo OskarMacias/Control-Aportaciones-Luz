@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div id="shiftBadge" class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
-                <span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span id="shiftStatusDot" class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                 <span id="shiftStatusText" class="text-slate-300 font-medium">Turno CERRADO</span>
             </div>
         </div>
@@ -44,12 +44,16 @@
                     </h2>
                     <p class="text-xs text-slate-400">Control diario de volumen, cuadre por cuenta y anomalías pendientes de enrutar.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button id="btnStartShift" type="button" onclick="openStartShiftModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 active:scale-95">
+                <div class="flex flex-wrap items-center gap-3">
+                    <button id="btnStartShift" type="button" onclick="openStartShiftModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
                         <i class="fa-solid fa-play"></i> Iniciar Turno
                     </button>
                     <button id="btnEndShift" type="button" onclick="openEndShiftModal()" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
                         <i class="fa-solid fa-flag-checkered"></i> Cuadrar y Cerrar Turno
+                    </button>
+                    <!-- BOTÓN RESTABLECER DÍA -->
+                    <button id="btnResetDay" type="button" onclick="resetCurrentDay()" class="bg-slate-700 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-rose-800/50 px-3 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Borra los paquetes y datos registrados hoy">
+                        <i class="fa-solid fa-rotate-right text-rose-400"></i> Restablecer Día
                     </button>
                 </div>
             </div>
@@ -376,7 +380,6 @@
             setupOCR();
         });
 
-        // FUNCIONES DE CONTROL DE MODALES DIRECTOS
         function openStartShiftModal() {
             document.getElementById('modalStartShift').classList.remove('hidden');
         }
@@ -395,6 +398,33 @@
 
         function closeEndShiftModal() {
             document.getElementById('modalEndShift').classList.add('hidden');
+        }
+
+        // RESTABLECER TODO LO HECHO EN EL DÍA
+        function resetCurrentDay() {
+            if (confirm("¿Estás seguro de que deseas restablecer el día? Esto borrará el conteo del turno actual y eliminará los paquetes registrados hoy.")) {
+                const todayStr = new Date().toLocaleDateString();
+                
+                // Conservar solo resguardos o paquetes anteriores a hoy
+                packages = packages.filter(p => p.date !== todayStr);
+                localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+
+                // Reiniciar estado del turno
+                shiftData = {
+                    active: false,
+                    newReceived: 0,
+                    rerouted: 0,
+                    damaris: 0,
+                    oskar: 0,
+                    zahori: 0,
+                    anomalies: 0
+                };
+                saveShiftData();
+
+                updateDashUI();
+                renderPackages();
+                alert("El día ha sido restablecido con éxito.");
+            }
         }
 
         function handleStatusChange(status) {
@@ -422,7 +452,7 @@
             );
 
             if (matches.length === 0) {
-                resultBox.innerHTML = `<p class="text-xs text-slate-400">No se encontraron registros de resguardo para este cliente o teléfono.</p>`;
+                resultBox.innerHTML = `<p class="text-xs text-slate-400">No se encontraron registros para este cliente o teléfono.</p>`;
                 resultBox.classList.remove('hidden');
                 return;
             }
@@ -439,7 +469,7 @@
                         <p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-xs mr-1"></i>${customerPhone}</p>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-slate-400">Total Paquetes Históricos:</span>
+                        <span class="text-xs text-slate-400">Total Histórico:</span>
                         <div class="text-lg font-bold text-orange-400">${totalResguardosHistoricos}</div>
                     </div>
                 </div>
@@ -471,12 +501,12 @@
                 });
                 html += `</div>`;
             } else {
-                html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes pendientes de recolección en resguardo actualmente.</p>`;
+                html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes pendientes en resguardo actualmente.</p>`;
             }
 
             html += `
                 <div class="pt-2">
-                    <p class="text-[11px] text-slate-400 mb-1">Historial de fechas de paquetes de este cliente:</p>
+                    <p class="text-[11px] text-slate-400 mb-1">Historial de fechas de paquetes:</p>
                     <div class="flex flex-wrap gap-1.5">
                         ${matches.map(p => `
                             <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded-md border border-slate-700">
@@ -581,15 +611,17 @@
             const btnEnd = document.getElementById('btnEndShift');
 
             if (shiftData.active) {
-                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
                 text.innerText = 'Turno ACTIVO';
+                text.className = 'text-emerald-400 font-bold';
                 btnStart.classList.add('opacity-50', 'cursor-not-allowed');
                 btnStart.disabled = true;
                 btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnEnd.disabled = false;
             } else {
-                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
                 text.innerText = 'Turno CERRADO';
+                text.className = 'text-slate-300 font-medium';
                 btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnStart.disabled = false;
                 btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
