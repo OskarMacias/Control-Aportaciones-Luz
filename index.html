@@ -98,10 +98,6 @@
                 <p class="text-xs text-slate-400">Busca por Nombre, Teléfono o Número de Guía/Tracking, o escanea directamente la guía con tu cámara.</p>
             </div>
 
-            <!-- Entradas de cámara para el buscador -->
-            <input type="file" id="searchCamInput" accept="image/*" capture="environment" class="hidden">
-            <input type="file" id="searchGalInput" accept="image/*" class="hidden">
-
             <div class="flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-1">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -109,13 +105,19 @@
                     </span>
                     <input type="text" id="dbSearchInput" placeholder="Escribe Nombre, Teléfono o Número de Seguimiento (Guía)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                 </div>
+                
                 <div class="flex gap-2">
-                    <button type="button" id="btnSearchCam" class="bg-orange-600 hover:bg-orange-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                    <!-- Botón Cámara directo -->
+                    <label class="bg-orange-600 hover:bg-orange-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-camera"></i> Escanear Guía
-                    </button>
-                    <button type="button" id="btnSearchGal" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                        <input type="file" id="searchCamInput" accept="image/*" capture="environment" class="hidden">
+                    </label>
+                    
+                    <!-- Botón Galería directo -->
+                    <label class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-images"></i> Galería
-                    </button>
+                        <input type="file" id="searchGalInput" accept="image/*" class="hidden">
+                    </label>
                 </div>
             </div>
 
@@ -147,9 +149,6 @@
                     </h2>
                     <p class="text-xs text-slate-400 mb-4">Escanea etiquetas para autocompletar el formulario o marcar paquetes como Entregados.</p>
 
-                    <input type="file" id="inputCam" accept="image/*" capture="environment" class="hidden">
-                    <input type="file" id="inputGal" accept="image/*" class="hidden">
-
                     <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center bg-slate-900/50 relative overflow-hidden min-h-[170px] flex flex-col items-center justify-center">
                         <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/90 backdrop-blur" alt="Vista previa">
                         <div id="dropzoneText" class="space-y-2">
@@ -172,12 +171,17 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <button type="button" id="btnCamTrigger" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer">
+                    <!-- Botón Cámara directo Registro -->
+                    <label class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-camera"></i> Tomar Foto
-                    </button>
-                    <button type="button" id="btnGalTrigger" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer">
+                        <input type="file" id="inputCam" accept="image/*" capture="environment" class="hidden">
+                    </label>
+
+                    <!-- Botón Galería directo Registro -->
+                    <label class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-images"></i> Galería
-                    </button>
+                        <input type="file" id="inputGal" accept="image/*" class="hidden">
+                    </label>
                 </div>
             </div>
 
@@ -361,14 +365,14 @@
 
     <!-- NÚCLEO JAVASCRIPT -->
     <script>
-        // Estado global limpio
+        // Estado global
         let AppState = {
             shift: { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 },
             packages: [],
             filter: 'all'
         };
 
-        // Carga al iniciar
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             loadStorage();
             initApp();
@@ -424,14 +428,6 @@
             document.getElementById('closeDamaris').oninput = calcularCuadreModal;
             document.getElementById('closeOskar').oninput = calcularCuadreModal;
             document.getElementById('closeZahori').oninput = calcularCuadreModal;
-
-            // Triggers cámara Registro
-            document.getElementById('btnCamTrigger').onclick = () => document.getElementById('inputCam').click();
-            document.getElementById('btnGalTrigger').onclick = () => document.getElementById('inputGal').click();
-
-            // Triggers cámara Búsqueda
-            document.getElementById('btnSearchCam').onclick = () => document.getElementById('searchCamInput').click();
-            document.getElementById('btnSearchGal').onclick = () => document.getElementById('searchGalInput').click();
 
             // Filtros de tabla
             document.getElementById('filterAll').onclick = () => setFilter('all');
