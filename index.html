@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Paquetería y Turnos - Oskar Macías</title>
+    <title>Control de Paquetería - Oskar Macías</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -69,8 +69,8 @@
                     <div class="text-2xl font-bold text-emerald-400 mt-1" id="dashOskar">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Zabori</span>
-                    <div class="text-2xl font-bold text-indigo-400 mt-1" id="dashZabori">0</div>
+                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Zahori</span>
+                    <div class="text-2xl font-bold text-indigo-400 mt-1" id="dashZahori">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700 col-span-2 md:col-span-1">
                     <span class="text-xs font-medium text-slate-400 uppercase">Anomalías / Faltantes</span>
@@ -82,27 +82,32 @@
         <!-- 2. CAPTURA OCR DE PAQUETES / FOTOS DE GUÍAS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Zona de Carga de Imagen -->
+            <!-- Zona de Carga de Imagen con Selección Directa Galería / Cámara -->
             <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
                         Escanear Foto de Guía / INE
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Sube o toma foto a la guía para extraer los datos del paquete automáticamente.</p>
-                    
-                    <div id="dropzone" class="border-2 border-dashed border-slate-600 hover:border-orange-500 rounded-xl p-6 text-center transition cursor-pointer bg-slate-900/50 relative overflow-hidden min-h-[200px] flex flex-col items-center justify-center">
-                        <input type="file" id="imageInput" accept="image/*" capture="environment" class="hidden">
+                    <p class="text-xs text-slate-400 mb-4">Elige tomar una foto directa o selecciona una imagen almacenada en tu galería.</p>
+
+                    <!-- Inputs ocultos independientes -->
+                    <input type="file" id="imageInputGallery" accept="image/*" class="hidden">
+                    <input type="file" id="imageInputCamera" accept="image/*" capture="environment" class="hidden">
+
+                    <!-- Vista previa -->
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center transition bg-slate-900/50 relative overflow-hidden min-h-[180px] flex flex-col items-center justify-center">
                         <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/80 backdrop-blur" alt="Vista previa">
                         
                         <div id="dropzoneText" class="space-y-2">
                             <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
-                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                                <i class="fa-solid fa-image text-xl"></i>
                             </div>
-                            <p class="text-sm font-medium text-slate-200">Tomar foto o cargar desde la galería</p>
+                            <p class="text-xs font-medium text-slate-300">Selecciona el origen de la foto de la guía</p>
                         </div>
                     </div>
 
+                    <!-- Progreso OCR -->
                     <div id="ocrProgress" class="hidden mt-4 space-y-2">
                         <div class="flex justify-between text-xs text-slate-300 font-medium">
                             <span id="ocrStatus">Procesando OCR...</span>
@@ -114,9 +119,15 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="document.getElementById('imageInput').click()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 mt-2">
-                    <i class="fa-solid fa-camera-retro"></i> Seleccionar Imagen
-                </button>
+                <!-- Botones duales independientes -->
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button type="button" onclick="document.getElementById('imageInputCamera').click()" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-camera"></i> Tomar Foto
+                    </button>
+                    <button type="button" onclick="document.getElementById('imageInputGallery').click()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-images"></i> Abrir Galería
+                    </button>
+                </div>
             </div>
 
             <!-- Formulario de Registro Individual -->
@@ -153,6 +164,15 @@
                                 <option value="Mercado Libre">Mercado Libre</option>
                                 <option value="Amazon">Amazon</option>
                                 <option value="Otra">Otra</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Cuenta Asignada *</label>
+                            <select id="inputAccount" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                                <option value="Damaris">Damaris</option>
+                                <option value="Oskar">Oskar</option>
+                                <option value="Zahori">Zahori</option>
                             </select>
                         </div>
                     </div>
@@ -220,6 +240,7 @@
                             <th class="py-3 px-4">Destinatario</th>
                             <th class="py-3 px-4">Teléfono</th>
                             <th class="py-3 px-4">Plataforma</th>
+                            <th class="py-3 px-4">Cuenta</th>
                             <th class="py-3 px-4">Estado</th>
                             <th class="py-3 px-4 text-right">Acciones</th>
                         </tr>
@@ -275,8 +296,8 @@
                         <input type="number" id="closeOskar" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-indigo-400 mb-1">Entregados Cuenta Zabori</label>
-                        <input type="number" id="closeZabori" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <label class="block text-xs font-medium text-indigo-400 mb-1">Entregados Cuenta Zahori</label>
+                        <input type="number" id="closeZahori" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
 
@@ -294,7 +315,7 @@
 
             <!-- Aviso si hay faltantes -->
             <div id="anomalyWarning" class="hidden bg-amber-950/40 border border-amber-700/60 p-3 rounded-xl text-xs text-amber-200">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Detectamos faltantes en el cuadre. Asegúrate de tomar foto a las guías de los paquetes faltantes para mantener tu registro en orden.
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Detectamos faltantes en el cuadre. Recuerda registrar o escanear la foto de la guía de los paquetes faltantes en la bitácora.
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
@@ -312,7 +333,7 @@
             received: 0,
             damaris: 0,
             oskar: 0,
-            zabori: 0,
+            zahori: 0,
             anomalies: 0
         };
 
@@ -324,7 +345,6 @@
             setupOCR();
         });
 
-        // Alternar vistas de modales
         function toggleShiftModal(type) {
             if (type === 'start') {
                 document.getElementById('modalStartShift').classList.toggle('hidden');
@@ -336,7 +356,6 @@
             }
         }
 
-        // Confirmar inicio de turno
         function confirmStartShift() {
             const amount = parseInt(document.getElementById('inputStartAmount').value);
             if (!amount || amount <= 0) return alert('Ingresa un número válido de paquetes.');
@@ -346,7 +365,7 @@
                 received: amount,
                 damaris: 0,
                 oskar: 0,
-                zabori: 0,
+                zahori: 0,
                 anomalies: 0
             };
 
@@ -355,13 +374,12 @@
             updateDashUI();
         }
 
-        // Calcular balances en modal de cierre
         function calculateBalance() {
             const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
             const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zabori = parseInt(document.getElementById('closeZabori').value) || 0;
+            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
 
-            const totalDelivered = damaris + oskar + zabori;
+            const totalDelivered = damaris + oskar + zahori;
             const anomalies = Math.max(0, shiftData.received - totalDelivered);
 
             document.getElementById('closeTotalDelivered').innerText = totalDelivered;
@@ -375,30 +393,28 @@
             }
         }
 
-        // Confirmar cierre de turno
         function confirmEndShift() {
             const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
             const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zabori = parseInt(document.getElementById('closeZabori').value) || 0;
+            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
 
             shiftData.damaris = damaris;
             shiftData.oskar = oskar;
-            shiftData.zabori = zabori;
-            shiftData.anomalies = Math.max(0, shiftData.received - (damaris + oskar + zabori));
+            shiftData.zahori = zahori;
+            shiftData.anomalies = Math.max(0, shiftData.received - (damaris + oskar + zahori));
             shiftData.active = false;
 
             saveShiftData();
             toggleShiftModal('end');
             updateDashUI();
-            alert(`Turno cerrado con éxito. Total entregados: ${damaris + oskar + zabori}. Faltantes: ${shiftData.anomalies}`);
+            alert(`Turno cerrado con éxito. Total entregados: ${damaris + oskar + zahori}. Faltantes: ${shiftData.anomalies}`);
         }
 
-        // Actualizar interfaz del tablero de turno
         function updateDashUI() {
             document.getElementById('dashReceived').innerText = shiftData.received;
             document.getElementById('dashDamaris').innerText = shiftData.damaris;
             document.getElementById('dashOskar').innerText = shiftData.oskar;
-            document.getElementById('dashZabori').innerText = shiftData.zabori;
+            document.getElementById('dashZahori').innerText = shiftData.zahori;
             document.getElementById('dashAnomalies').innerText = shiftData.anomalies;
 
             const dot = document.getElementById('shiftStatusDot');
@@ -423,14 +439,12 @@
             }
         }
 
-        // Configuración OCR
+        // Manejo OCR independiente para Galería y Cámara
         function setupOCR() {
-            const imageInput = document.getElementById('imageInput');
-            const dropzone = document.getElementById('dropzone');
+            const galleryInput = document.getElementById('imageInputGallery');
+            const cameraInput = document.getElementById('imageInputCamera');
 
-            dropzone.addEventListener('click', () => imageInput.click());
-
-            imageInput.addEventListener('change', async (e) => {
+            const handleFileSelect = async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
@@ -471,10 +485,12 @@
                     console.error(err);
                     ocrStatus.innerText = 'Error al leer imagen. Ingresa los datos manualmente.';
                 } setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
-            });
+            };
+
+            galleryInput.addEventListener('change', handleFileSelect);
+            cameraInput.addEventListener('change', handleFileSelect);
         }
 
-        // Analizar texto OCR
         function parseOCRText(text) {
             const trackingMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
             if (trackingMatch) document.getElementById('inputTracking').value = trackingMatch[0].toUpperCase();
@@ -495,7 +511,6 @@
             else if (upper.includes('AMAZON')) platform.value = 'Amazon';
         }
 
-        // Guardar paquete en la lista
         function savePackage(e) {
             e.preventDefault();
 
@@ -503,6 +518,7 @@
             const name = document.getElementById('inputName').value.trim();
             const phone = document.getElementById('inputPhone').value.trim();
             const platform = document.getElementById('inputPlatform').value;
+            const account = document.getElementById('inputAccount').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
 
             packages.unshift({
@@ -511,6 +527,7 @@
                 name,
                 phone,
                 platform,
+                account,
                 status,
                 date: new Date().toLocaleDateString()
             });
@@ -521,7 +538,6 @@
             document.getElementById('imagePreview').classList.add('hidden');
         }
 
-        // Renderizar tabla
         function renderPackages() {
             const body = document.getElementById('packageTableBody');
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -533,7 +549,7 @@
             );
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-xs text-slate-500">No hay registros cargados.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay registros cargados.</td></tr>`;
                 return;
             }
 
@@ -549,6 +565,7 @@
                         <td class="py-3 px-4 text-slate-100 font-medium">${p.name}</td>
                         <td class="py-3 px-4 text-xs font-mono text-slate-300">${p.phone}</td>
                         <td class="py-3 px-4 text-xs text-slate-300">${p.platform}</td>
+                        <td class="py-3 px-4 text-xs text-slate-300 font-semibold">${p.account || 'N/A'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">
                                 ${p.status}
@@ -578,9 +595,9 @@
 
         function exportCSV() {
             if (packages.length === 0) return alert('Sin datos para exportar.');
-            let csv = 'Tracking,Nombre,Telefono,Plataforma,Estado,Fecha\n';
+            let csv = 'Tracking,Nombre,Telefono,Plataforma,Cuenta,Estado,Fecha\n';
             packages.forEach(p => {
-                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.status}","${p.date}"\n`;
+                csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.account || ''}","${p.status}","${p.date}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
