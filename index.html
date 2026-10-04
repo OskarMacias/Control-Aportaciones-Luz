@@ -11,132 +11,132 @@
     <!-- Tesseract.js para OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased pb-12">
 
     <!-- Header / Navbar -->
-    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="bg-orange-500 text-white p-2.5 rounded-xl shadow-lg shadow-orange-500/30">
                     <i class="fa-solid fa-boxes-packing text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">Control de Paquetería</h1>
-                    <p class="text-xs text-slate-400">Gestión de Turnos, Resguardos & Búsqueda Histórica</p>
+                    <h1 class="text-lg font-bold text-white tracking-tight">Control de Paquetería</h1>
+                    <p class="text-xs text-slate-400 font-medium">Gestión de Oskar Macías</p>
                 </div>
             </div>
-            <div id="shiftBadge" class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
-                <span id="shiftStatusDot" class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                <span id="shiftStatusText" class="text-slate-300 font-medium">Turno CERRADO</span>
+            
+            <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-full border border-slate-700">
+                <span id="badgeDot" class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span id="badgeText" class="text-xs font-semibold text-slate-300">Turno CERRADO</span>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- 1. CONTROL DE TURNO DIARIO Y RESUMEN -->
-        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-5">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700/60 pb-4">
+        <!-- 1. SECCIÓN: CONTROL DE TURNO Y DASHBOARD -->
+        <section class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-5">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/60 pb-4">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
-                        Apertura y Cierre de Turno
+                        Apertura, Cierre y Resumen Diario
                     </h2>
-                    <p class="text-xs text-slate-400">Control diario de volumen, cuadre por cuenta y anomalías pendientes de enrutar.</p>
+                    <p class="text-xs text-slate-400">Inicia tu jornada ingresando la recepción y cuadra por cuentas al finalizar.</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <button id="btnStartShift" type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95">
+                
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button id="btnAbrirTurno" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-play"></i> Iniciar Turno
                     </button>
-                    <button id="btnEndShift" type="button" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
-                        <i class="fa-solid fa-flag-checkered"></i> Cuadrar y Cerrar Turno
+                    <button id="btnCerrarTurno" class="bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-flag-checkered"></i> Cerrar Turno
                     </button>
-                    <!-- BOTÓN RESTABLECER DÍA -->
-                    <button id="btnResetDay" type="button" class="bg-slate-700 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-rose-800/50 px-3 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                    <button id="btnResetDay" class="bg-slate-700 hover:bg-rose-950 text-rose-300 border border-rose-800/50 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-rotate-right text-rose-400"></i> Restablecer Día
                     </button>
                 </div>
             </div>
 
-            <!-- Dashboard de KPIs -->
+            <!-- KPIs Dashboard -->
             <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-slate-400 uppercase">Nuevos Recibidos</span>
-                    <div class="text-xl font-bold text-white mt-1" id="dashReceived">0</div>
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Recibidos Hoy</span>
+                    <div class="text-xl font-bold text-white mt-1" id="kpiRecibidos">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-amber-400 uppercase">Re-enrutados</span>
-                    <div class="text-xl font-bold text-amber-400 mt-1" id="dashRerouted">0</div>
+                    <span class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider">Re-enrutados</span>
+                    <div class="text-xl font-bold text-amber-400 mt-1" id="kpiReenrutados">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-sky-400 uppercase">Cuenta Damaris</span>
-                    <div class="text-xl font-bold text-sky-400 mt-1" id="dashDamaris">0</div>
+                    <span class="text-[10px] font-semibold text-sky-400 uppercase tracking-wider">Cuenta Damaris</span>
+                    <div class="text-xl font-bold text-sky-400 mt-1" id="kpiDamaris">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-emerald-400 uppercase">Cuenta Oskar</span>
-                    <div class="text-xl font-bold text-emerald-400 mt-1" id="dashOskar">0</div>
+                    <span class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Cuenta Oskar</span>
+                    <div class="text-xl font-bold text-emerald-400 mt-1" id="kpiOskar">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-indigo-400 uppercase">Cuenta Zahori</span>
-                    <div class="text-xl font-bold text-indigo-400 mt-1" id="dashZahori">0</div>
+                    <span class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider">Cuenta Zahori</span>
+                    <div class="text-xl font-bold text-indigo-400 mt-1" id="kpiZahori">0</div>
                 </div>
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                    <span class="text-[10px] font-medium text-purple-400 uppercase">En Resguardo Activo</span>
-                    <div class="text-xl font-bold text-purple-400 mt-1" id="dashResguardoTotal">0</div>
+                    <span class="text-[10px] font-semibold text-purple-400 uppercase tracking-wider">Resguardo Activo</span>
+                    <div class="text-xl font-bold text-purple-400 mt-1" id="kpiResguardo">0</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 2. BÚSQUEDA HISTÓRICA DE CLIENTES Y BASE DE DATOS DE RESGUARDOS -->
-        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
+        <!-- 2. SECCIÓN: BUSCADOR HISTÓRICO DE CLIENTES -->
+        <section class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
             <div>
-                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-database text-orange-400"></i>
                     Buscador Histórico de Clientes & Resguardos
                 </h2>
-                <p class="text-xs text-slate-400">Consulta cuántos paquetes ha tenido en resguardo una persona, en qué fechas y cuántos días lleva su paquete actual guardado.</p>
+                <p class="text-xs text-slate-400">Busca por nombre o número de teléfono para ver paquetes en resguardo actual e historial de entregas.</p>
             </div>
 
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                     <i class="fa-solid fa-magnifying-glass text-xs"></i>
                 </span>
-                <input type="text" id="dbSearchInput" placeholder="Ingresa Nombre completo o Número de Teléfono del cliente..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                <input type="text" id="dbSearchInput" placeholder="Nombre completo o Teléfono del cliente..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
             </div>
 
             <div id="dbSearchResult" class="hidden bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
-                <!-- Resultado dinámico -->
+                <!-- Resultados dinámicos -->
             </div>
-        </div>
+        </section>
 
-        <!-- 3. ESCÁNER OCR Y FORMULARIO DE REGISTRO CON FECHA DE RESGUARDO -->
+        <!-- 3. SECCIÓN: OCR Y REGISTRO DE PAQUETES -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Zona OCR / Escáner -->
+            <!-- OCR / Escáner -->
             <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
-                        Escáner de Guías / Identificación
+                        Escáner de Guía / OCR
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Si escaneas un paquete que estaba **En Resguardo**, el sistema lo marcará como **Entregado** automáticamente.</p>
+                    <p class="text-xs text-slate-400 mb-4">Escanea etiquetas para autocompletar la guía o marcar paquetes en resguardo como Entregados.</p>
 
-                    <input type="file" id="imageInputGallery" accept="image/*" class="hidden">
-                    <input type="file" id="imageInputCamera" accept="image/*" capture="environment" class="hidden">
+                    <input type="file" id="inputCam" accept="image/*" capture="environment" class="hidden">
+                    <input type="file" id="inputGal" accept="image/*" class="hidden">
 
-                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center transition bg-slate-900/50 relative overflow-hidden min-h-[180px] flex flex-col items-center justify-center">
-                        <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/80 backdrop-blur" alt="Vista previa">
-                        
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center bg-slate-900/50 relative overflow-hidden min-h-[170px] flex flex-col items-center justify-center">
+                        <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/90 backdrop-blur" alt="Vista previa">
                         <div id="dropzoneText" class="space-y-2">
                             <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
                                 <i class="fa-solid fa-barcode text-xl"></i>
                             </div>
-                            <p class="text-xs font-medium text-slate-300">Escanea la guía para entrega rápida o captura</p>
+                            <p class="text-xs font-medium text-slate-300">Captura la guía para lectura automática</p>
                         </div>
                     </div>
 
-                    <div id="ocrProgress" class="hidden mt-4 space-y-2">
-                        <div class="flex justify-between text-xs text-slate-300 font-medium">
+                    <div id="ocrProgress" class="hidden mt-3 space-y-1">
+                        <div class="flex justify-between text-xs text-slate-300">
                             <span id="ocrStatus">Procesando OCR...</span>
                             <span id="ocrPercent">0%</span>
                         </div>
@@ -147,31 +147,31 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <button type="button" id="btnCam" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <button type="button" id="btnCamTrigger" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-camera"></i> Tomar Foto
                     </button>
-                    <button type="button" id="btnGal" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-images"></i> Abrir Galería
+                    <button type="button" id="btnGalTrigger" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-images"></i> Galería
                     </button>
                 </div>
             </div>
 
             <!-- Formulario de Registro -->
             <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
-                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-orange-400"></i>
-                    Registro y Clasificación de Paquete
+                    Registro de Paquete
                 </h2>
 
-                <form id="packageForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form id="pkgForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Número de Guía / Tracking *</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Guía / Tracking *</label>
                             <input type="text" id="inputTracking" required placeholder="Ej. JMX300992598902" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo del Cliente *</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre del Cliente *</label>
                             <input type="text" id="inputName" required placeholder="Ej. Mónica Leyva" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
                         </div>
 
@@ -181,7 +181,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Plataforma / Tienda *</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Plataforma *</label>
                             <select id="inputPlatform" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
                                 <option value="J&T Express">J&T Express</option>
                                 <option value="SHEIN">SHEIN</option>
@@ -205,64 +205,63 @@
                         <div>
                             <label class="block text-xs font-medium text-amber-400 mb-1">Fecha de Entrada a Resguardo</label>
                             <input type="date" id="inputResguardoDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
-                            <span class="text-[10px] text-slate-500">Para ordenar por fecha histórica de resguardo.</span>
                         </div>
                     </div>
 
-                    <!-- Selección de Estado -->
+                    <!-- Estado del Registro -->
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Registro *</label>
+                        <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Paquete *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 bg-slate-900 flex flex-col items-center gap-1 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
                                 <input type="radio" name="statusOption" value="Entregado" checked class="hidden">
                                 <i class="fa-solid fa-circle-check text-emerald-400"></i>
                                 <span class="text-xs font-medium text-slate-200">Entregado</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
                                 <input type="radio" name="statusOption" value="Anomalia" class="hidden">
                                 <i class="fa-solid fa-truck-ramp-box text-amber-400"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Anomalía (Sin Cuenta)</span>
+                                <span class="text-xs font-medium text-slate-200 text-center">Anomalía</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
                                 <input type="radio" name="statusOption" value="Resguardo" class="hidden">
                                 <i class="fa-solid fa-warehouse text-indigo-400"></i>
-                                <span class="text-xs font-medium text-slate-200">En Resguardo</span>
+                                <span class="text-xs font-medium text-slate-200">Resguardo</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
                                 <input type="radio" name="statusOption" value="Devolucion" class="hidden">
                                 <i class="fa-solid fa-rotate-left text-rose-400"></i>
-                                <span class="text-xs font-medium text-slate-200 text-center">Devolución / Rechazo</span>
+                                <span class="text-xs font-medium text-slate-200 text-center">Devolución</span>
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-plus"></i> Guardar Paquete en Bitácora
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- 4. BITÁCORA Y ORDEN DE RESGUARDOS -->
-        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
+        <!-- 4. SECCIÓN: BITÁCORA Y TABLA DE REGISTROS -->
+        <section class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-list-check text-orange-400"></i>
                         Bitácora General de Paquetes
                     </h2>
-                    <p class="text-xs text-slate-400">Pestañas para ver la lista completa o filtrar exclusivamente resguardos ordenados por fecha.</p>
+                    <p class="text-xs text-slate-400">Filtra la lista completa o visualiza únicamente resguardos.</p>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <button id="btnFilterAll" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition">Todos</button>
-                    <button id="btnFilterResguardo" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition">Solo Resguardos</button>
+                    <button id="filterAll" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition">Todos</button>
+                    <button id="filterResguardo" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition">Solo Resguardos</button>
                     
-                    <input type="text" id="searchInput" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                    <button id="btnExport" type="button" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                    <input type="text" id="searchInput" placeholder="Buscar guía o cliente..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                    <button id="btnExport" type="button" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-file-csv"></i> Exportar
                     </button>
                 </div>
@@ -278,20 +277,20 @@
                             <th class="py-3 px-4">Fecha Resguardo</th>
                             <th class="py-3 px-4">Cuenta</th>
                             <th class="py-3 px-4">Estado</th>
-                            <th class="py-3 px-4 text-right">Acciones</th>
+                            <th class="py-3 px-4 text-right">Acción</th>
                         </tr>
                     </thead>
-                    <tbody id="packageTableBody" class="divide-y divide-slate-700/60 bg-slate-900/30">
+                    <tbody id="tableBody" class="divide-y divide-slate-700/60 bg-slate-900/30">
                         <!-- Filas dinámicas -->
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
     </main>
 
     <!-- MODAL APERTURA TURNO -->
-    <div id="modalStartShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="modalStart" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-box-open text-orange-400"></i> Iniciar Nuevo Turno
@@ -304,24 +303,24 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" id="btnCancelStart" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
-                <button type="button" id="btnConfirmStart" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
+                <button type="button" id="modalStartCancel" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer">Cancelar</button>
+                <button type="button" id="modalStartConfirm" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold cursor-pointer">Iniciar Turno</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL CIERRE TURNO -->
-    <div id="modalEndShift" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="modalEnd" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-calculator text-orange-400"></i> Cuadre y Cierre de Turno
             </h3>
-            <p class="text-xs text-slate-400">Ingresa las entregas repartidas por cuenta. Las diferencias pasarán como anomalías para mañana.</p>
+            <p class="text-xs text-slate-400">Ingresa las entregas por cuenta. Las diferencias se registrarán como anomalías.</p>
             
             <div class="space-y-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700">
                 <div class="flex justify-between text-xs text-slate-300 font-medium">
                     <span>Total Paquetes en Ruta Hoy:</span>
-                    <span id="closeTotalReceived" class="font-bold text-white">0</span>
+                    <span id="closeTotalRoute" class="font-bold text-white">0</span>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-3 pt-2">
@@ -342,7 +341,7 @@
                 <div class="border-t border-slate-700 pt-3 space-y-1">
                     <div class="flex justify-between text-xs text-slate-300">
                         <span>Total Entregados:</span>
-                        <span id="closeTotalDelivered" class="font-bold text-emerald-400">0</span>
+                        <span id="closeDelivered" class="font-bold text-emerald-400">0</span>
                     </div>
                     <div class="flex justify-between text-xs text-slate-300">
                         <span>Anomalías No Entregadas:</span>
@@ -352,404 +351,182 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" id="btnCancelEnd" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
-                <button type="button" id="btnConfirmEnd" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
+                <button type="button" id="modalEndCancel" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer">Volver</button>
+                <button type="button" id="modalEndConfirm" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold cursor-pointer">Cerrar Turno Definitivo</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL OPTIMIZADO -->
+    <!-- NÚCLEO JAVASCRIPT COMPLETAMENTE REESCRITO -->
     <script>
-        // Variables globales
-        let shiftData = { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 };
-        let packages = [];
-        let currentFilter = 'all';
+        // Estado global limpio
+        let AppState = {
+            shift: { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 },
+            packages: [],
+            filter: 'all'
+        };
 
-        // Carga inicial
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                const savedShift = localStorage.getItem('oskar_shift_data');
-                if (savedShift) shiftData = JSON.parse(savedShift);
-                
-                const savedPkgs = localStorage.getItem('oskar_packages_list');
-                if (savedPkgs) packages = JSON.parse(savedPkgs);
-            } catch (e) {
-                console.error("Error leyendo datos", e);
-            }
-
-            document.getElementById('inputResguardoDate').valueAsDate = new Date();
-            
-            bindEvents();
-            updateDashUI();
-            renderPackages();
-            setupOCR();
+        // Carga al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStorage();
+            initApp();
         });
 
-        function bindEvents() {
-            // Botones de turno
-            document.getElementById('btnStartShift').addEventListener('click', () => {
-                document.getElementById('modalStartShift').classList.remove('hidden');
-            });
+        function loadStorage() {
+            try {
+                const s = localStorage.getItem('oskar_shift_v2');
+                if (s) AppState.shift = JSON.parse(s);
 
-            document.getElementById('btnCancelStart').addEventListener('click', () => {
-                document.getElementById('modalStartShift').classList.add('hidden');
-            });
-
-            document.getElementById('btnConfirmStart').addEventListener('click', confirmStartShift);
-
-            document.getElementById('btnEndShift').addEventListener('click', () => {
-                if (!shiftData.active) return;
-                const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
-                document.getElementById('closeTotalReceived').innerText = totalInRoute;
-                calculateBalance();
-                document.getElementById('modalEndShift').classList.remove('hidden');
-            });
-
-            document.getElementById('btnCancelEnd').addEventListener('click', () => {
-                document.getElementById('modalEndShift').classList.add('hidden');
-            });
-
-            document.getElementById('btnConfirmEnd').addEventListener('click', confirmEndShift);
-
-            // Botón restablecer día
-            document.getElementById('btnResetDay').addEventListener('click', resetCurrentDay);
-
-            // Inputs de cierre
-            document.getElementById('closeDamaris').addEventListener('input', calculateBalance);
-            document.getElementById('closeOskar').addEventListener('input', calculateBalance);
-            document.getElementById('closeZahori').addEventListener('input', calculateBalance);
-
-            // Cam / Galería
-            document.getElementById('btnCam').addEventListener('click', () => document.getElementById('imageInputCamera').click());
-            document.getElementById('btnGal').addEventListener('click', () => document.getElementById('imageInputGallery').click());
-
-            // Filtros tabla
-            document.getElementById('btnFilterAll').addEventListener('click', () => setFilterMode('all'));
-            document.getElementById('btnFilterResguardo').addEventListener('click', () => setFilterMode('resguardo'));
-            document.getElementById('searchInput').addEventListener('input', renderPackages);
-            document.getElementById('btnExport').addEventListener('click', exportCSV);
-
-            // Búsqueda BD
-            document.getElementById('dbSearchInput').addEventListener('input', searchCustomerDB);
-
-            // Formulario de guardar paquete
-            document.getElementById('packageForm').addEventListener('submit', savePackage);
-
-            // Radio de anomalía
-            document.querySelectorAll('input[name="statusOption"]').forEach(radio => {
-                radio.addEventListener('change', (e) => handleStatusChange(e.target.value));
-            });
+                const p = localStorage.getItem('oskar_packages_v2');
+                if (p) AppState.packages = JSON.parse(p);
+            } catch (err) {
+                console.error("Error al cargar localStorage", err);
+            }
         }
 
-        function confirmStartShift() {
-            const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
-            const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
+        function saveStorage() {
+            localStorage.setItem('oskar_shift_v2', JSON.stringify(AppState.shift));
+            localStorage.setItem('oskar_packages_v2', JSON.stringify(AppState.packages));
+        }
 
-            packages = packages.map(p => {
+        function initApp() {
+            document.getElementById('inputResguardoDate').valueAsDate = new Date();
+
+            // Asignar listeners directos
+            document.getElementById('btnAbrirTurno').onclick = () => {
+                document.getElementById('modalStart').classList.remove('hidden');
+            };
+
+            document.getElementById('modalStartCancel').onclick = () => {
+                document.getElementById('modalStart').classList.add('hidden');
+            };
+
+            document.getElementById('modalStartConfirm').onclick = iniciarTurnoAction;
+
+            document.getElementById('btnCerrarTurno').onclick = () => {
+                if (!AppState.shift.active) return;
+                const totalRuta = (AppState.shift.newReceived || 0) + (AppState.shift.rerouted || 0);
+                document.getElementById('closeTotalRoute').innerText = totalRuta;
+                calcularCuadreModal();
+                document.getElementById('modalEnd').classList.remove('hidden');
+            };
+
+            document.getElementById('modalEndCancel').onclick = () => {
+                document.getElementById('modalEnd').classList.add('hidden');
+            };
+
+            document.getElementById('modalEndConfirm').onclick = cerrarTurnoAction;
+
+            document.getElementById('btnResetDay').onclick = restablecerDiaAction;
+
+            // Inputs de cálculo en cierre
+            document.getElementById('closeDamaris').oninput = calcularCuadreModal;
+            document.getElementById('closeOskar').oninput = calcularCuadreModal;
+            document.getElementById('closeZahori').oninput = calcularCuadreModal;
+
+            // Triggers de cámara
+            document.getElementById('btnCamTrigger').onclick = () => document.getElementById('inputCam').click();
+            document.getElementById('btnGalTrigger').onclick = () => document.getElementById('inputGal').click();
+
+            // Filtros de tabla
+            document.getElementById('filterAll').onclick = () => setFilter('all');
+            document.getElementById('filterResguardo').onclick = () => setFilter('resguardo');
+            document.getElementById('searchInput').oninput = renderTable;
+            document.getElementById('btnExport').onclick = exportarCSV;
+
+            // Búsqueda de clientes
+            document.getElementById('dbSearchInput').oninput = buscarClienteDB;
+
+            // Formulario de paquete
+            document.getElementById('pkgForm').onsubmit = guardarPaqueteAction;
+
+            // Radios de estado
+            document.querySelectorAll('input[name="statusOption"]').forEach(r => {
+                r.onchange = (e) => {
+                    const acc = document.getElementById('inputAccount');
+                    if (e.target.value === 'Anomalia') {
+                        acc.value = '';
+                        acc.disabled = true;
+                    } else {
+                        acc.disabled = false;
+                        if (!acc.value) acc.value = 'Damaris';
+                    }
+                };
+            });
+
+            setupOCR();
+            refreshUI();
+        }
+
+        function iniciarTurnoAction() {
+            const num = parseInt(document.getElementById('inputStartAmount').value) || 0;
+            const reEnrutados = AppState.packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
+
+            AppState.packages = AppState.packages.map(p => {
                 if (p.status === 'Anomalia') return { ...p, status: 'En Ruta' };
                 return p;
             });
-            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
 
-            shiftData = {
+            AppState.shift = {
                 active: true,
-                newReceived: newAmount,
-                rerouted: reroutedCount,
+                newReceived: num,
+                rerouted: reEnrutados,
                 damaris: 0,
                 oskar: 0,
                 zahori: 0,
                 anomalies: 0
             };
 
-            saveShiftData();
-            document.getElementById('modalStartShift').classList.add('hidden');
-            updateDashUI();
-            renderPackages();
+            saveStorage();
+            document.getElementById('modalStart').classList.add('hidden');
+            document.getElementById('inputStartAmount').value = '';
+            refreshUI();
         }
 
-        function calculateBalance() {
-            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
-            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
+        function calcularCuadreModal() {
+            const d = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const o = parseInt(document.getElementById('closeOskar').value) || 0;
+            const z = parseInt(document.getElementById('closeZahori').value) || 0;
 
-            const totalDelivered = damaris + oskar + zahori;
-            const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
-            const anomalies = Math.max(0, totalInRoute - totalDelivered);
+            const entregados = d + o + z;
+            const totalRuta = (AppState.shift.newReceived || 0) + (AppState.shift.rerouted || 0);
+            const anom = Math.max(0, totalRuta - entregados);
 
-            document.getElementById('closeTotalDelivered').innerText = totalDelivered;
-            document.getElementById('closeAnomalies').innerText = anomalies;
+            document.getElementById('closeDelivered').innerText = entregados;
+            document.getElementById('closeAnomalies').innerText = anom;
         }
 
-        function confirmEndShift() {
-            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
-            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
+        function cerrarTurnoAction() {
+            const d = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const o = parseInt(document.getElementById('closeOskar').value) || 0;
+            const z = parseInt(document.getElementById('closeZahori').value) || 0;
 
-            const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
-            shiftData.damaris = damaris;
-            shiftData.oskar = oskar;
-            shiftData.zahori = zahori;
-            shiftData.anomalies = Math.max(0, totalInRoute - (damaris + oskar + zahori));
-            shiftData.active = false;
+            const totalRuta = (AppState.shift.newReceived || 0) + (AppState.shift.rerouted || 0);
+            AppState.shift.damaris = d;
+            AppState.shift.oskar = o;
+            AppState.shift.zahori = z;
+            AppState.shift.anomalies = Math.max(0, totalRuta - (d + o + z));
+            AppState.shift.active = false;
 
-            saveShiftData();
-            document.getElementById('modalEndShift').classList.add('hidden');
-            updateDashUI();
-            alert(`Turno cerrado. Entregados: ${damaris + oskar + zahori}. Anomalías guardadas: ${shiftData.anomalies}`);
+            saveStorage();
+            document.getElementById('modalEnd').classList.add('hidden');
+            refreshUI();
+            alert(`Turno cerrado. Entregados: ${d + o + z}. Anomalías: ${AppState.shift.anomalies}`);
         }
 
-        function resetCurrentDay() {
-            if (confirm("¿Estás seguro de que deseas restablecer el día? Esto desactivará el turno y limpiará los paquetes registrados hoy.")) {
-                const todayStr = new Date().toLocaleDateString();
-                packages = packages.filter(p => p.date !== todayStr);
-                localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-
-                shiftData = { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 };
-                saveShiftData();
-
-                updateDashUI();
-                renderPackages();
-                alert("El día ha sido restablecido exitosamente.");
-            }
-        }
-
-        function handleStatusChange(status) {
-            const accountSelect = document.getElementById('inputAccount');
-            if (status === 'Anomalia') {
-                accountSelect.value = '';
-                accountSelect.disabled = true;
-            } else {
-                accountSelect.disabled = false;
-                if (!accountSelect.value) accountSelect.value = 'Damaris';
-            }
-        }
-
-        function updateDashUI() {
-            document.getElementById('dashReceived').innerText = shiftData.newReceived || 0;
-            document.getElementById('dashRerouted').innerText = shiftData.rerouted || 0;
-            document.getElementById('dashDamaris').innerText = shiftData.damaris || 0;
-            document.getElementById('dashOskar').innerText = shiftData.oskar || 0;
-            document.getElementById('dashZahori').innerText = shiftData.zahori || 0;
-            
-            const activeResguardosCount = packages.filter(p => p.status === 'Resguardo').length;
-            document.getElementById('dashResguardoTotal').innerText = activeResguardosCount;
-
-            const dot = document.getElementById('shiftStatusDot');
-            const text = document.getElementById('shiftStatusText');
-            const btnStart = document.getElementById('btnStartShift');
-            const btnEnd = document.getElementById('btnEndShift');
-
-            if (shiftData.active) {
-                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
-                text.innerText = 'Turno ACTIVO';
-                text.className = 'text-emerald-400 font-bold';
-                btnStart.classList.add('opacity-50', 'cursor-not-allowed');
-                btnStart.disabled = true;
-                btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnEnd.disabled = false;
-            } else {
-                dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
-                text.innerText = 'Turno CERRADO';
-                text.className = 'text-slate-300 font-medium';
-                btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnStart.disabled = false;
-                btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
-                btnEnd.disabled = true;
-            }
-        }
-
-        function searchCustomerDB() {
-            const query = document.getElementById('dbSearchInput').value.trim().toLowerCase();
-            const resultBox = document.getElementById('dbSearchResult');
-
-            if (query.length < 3) {
-                resultBox.classList.add('hidden');
-                return;
-            }
-
-            const matches = packages.filter(p => (p.name.toLowerCase().includes(query) || p.phone.includes(query)));
-
-            if (matches.length === 0) {
-                resultBox.innerHTML = `<p class="text-xs text-slate-400">No se encontraron registros para este cliente o teléfono.</p>`;
-                resultBox.classList.remove('hidden');
-                return;
-            }
-
-            const activeResguardos = matches.filter(p => p.status === 'Resguardo');
-            const totalResguardosHistoricos = matches.length;
-            const customerName = matches[0].name;
-            const customerPhone = matches[0].phone;
-
-            let html = `
-                <div class="flex justify-between items-start border-b border-slate-700/80 pb-3">
-                    <div>
-                        <h4 class="text-sm font-bold text-white">${customerName}</h4>
-                        <p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-xs mr-1"></i>${customerPhone}</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs text-slate-400">Total Histórico:</span>
-                        <div class="text-lg font-bold text-orange-400">${totalResguardosHistoricos}</div>
-                    </div>
-                </div>
-            `;
-
-            if (activeResguardos.length > 0) {
-                html += `<div class="space-y-2 pt-1"><p class="text-xs font-semibold text-purple-400"> Paquete(s) Actualmente en Resguardo:</p>`;
+        function restablecerDiaAction() {
+            if (confirm("¿Deseas restablecer el día? Esto desactivará el turno y borrará los paquetes cargados hoy.")) {
+                const hoy = new Date().toLocaleDateString();
+                AppState.packages = AppState.packages.filter(p => p.date !== hoy);
+                AppState.shift = { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 };
                 
-                activeResguardos.forEach(p => {
-                    const resguardoDate = new Date(p.resguardoDate || p.date);
-                    const today = new Date();
-                    const diffTime = Math.abs(today - resguardoDate);
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-                    html += `
-                        <div class="bg-slate-800/90 p-2.5 rounded-lg border border-purple-500/30 flex justify-between items-center text-xs">
-                            <div>
-                                <span class="font-mono font-bold text-orange-400">${p.tracking}</span>
-                                <span class="text-slate-400 ml-2">(${p.platform})</span>
-                                <div class="text-[11px] text-slate-300">En resguardo desde: <strong class="text-white">${p.resguardoDate || p.date}</strong></div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                                    ${diffDays === 0 ? 'Ingresó Hoy' : `${diffDays} día(s) guardado`}
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            } else {
-                html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes pendientes en resguardo actualmente.</p>`;
+                saveStorage();
+                refreshUI();
+                alert("Día restablecido correctamente.");
             }
-
-            html += `
-                <div class="pt-2">
-                    <p class="text-[11px] text-slate-400 mb-1">Historial de fechas de paquetes:</p>
-                    <div class="flex flex-wrap gap-1.5">
-                        ${matches.map(p => `
-                            <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded-md border border-slate-700">
-                                ${p.resguardoDate \vert{}\vert{} p.date} (${p.status})
-                            </span>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            resultBox.innerHTML = html;
-            resultBox.classList.remove('hidden');
         }
 
-        function setFilterMode(mode) {
-            currentFilter = mode;
-            const btnAll = document.getElementById('btnFilterAll');
-            const btnResguardo = document.getElementById('btnFilterResguardo');
-
-            if (mode === 'all') {
-                btnAll.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition";
-                btnResguardo.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
-            } else {
-                btnResguardo.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition";
-                btnAll.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
-            }
-            renderPackages();
-        }
-
-        function setupOCR() {
-            const galleryInput = document.getElementById('imageInputGallery');
-            const cameraInput = document.getElementById('imageInputCamera');
-
-            const handleFileSelect = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const imgPreview = document.getElementById('imagePreview');
-                    imgPreview.src = event.target.result;
-                    imgPreview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-
-                const ocrProgress = document.getElementById('ocrProgress');
-                const ocrBar = document.getElementById('ocrBar');
-                const ocrStatus = document.getElementById('ocrStatus');
-
-                ocrProgress.classList.remove('hidden');
-
-                try {
-                    const worker = await Tesseract.createWorker('spa');
-                    worker.setParameters({
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                const progress = Math.round(m.progress * 100);
-                                ocrBar.style.width = `${progress}%`;
-                                document.getElementById('ocrPercent').innerText = `${progress}%`;
-                                ocrStatus.innerText = 'Escaneando etiqueta...';
-                            }
-                        }
-                    });
-
-                    const { data: { text } } = await worker.recognize(file);
-                    await worker.terminate();
-
-                    ocrStatus.innerText = '¡OCR Completado!';
-                    parseOCRText(text);
-                } catch (err) {
-                    console.error(err);
-                    ocrStatus.innerText = 'Error de lectura. Ingresa manualmente.';
-                } setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
-            };
-
-            galleryInput.addEventListener('change', handleFileSelect);
-            cameraInput.addEventListener('change', handleFileSelect);
-        }
-
-        function parseOCRText(text) {
-            const trackingMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
-            if (trackingMatch) {
-                const trackingFound = trackingMatch[0].toUpperCase();
-                document.getElementById('inputTracking').value = trackingFound;
-
-                const existingIndex = packages.findIndex(p => p.tracking === trackingFound);
-                if (existingIndex !== -1) {
-                    const pkg = packages[existingIndex];
-                    if (pkg.status === 'Resguardo') {
-                        if (confirm(`El paquete ${trackingFound} de ${pkg.name} estaba 'En Resguardo'. ¿Deseas marcarlo como ENTREGADO al cliente en este momento?`)) {
-                            packages[existingIndex].status = 'Entregado';
-                            packages[existingIndex].deliveryDate = new Date().toLocaleDateString();
-                            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-                            renderPackages();
-                            updateDashUI();
-                            alert(`¡Paquete ${trackingFound} marcado como ENTREGADO exitosamente!`);
-                            return;
-                        }
-                    } else if (pkg.status === 'Anomalia') {
-                        packages[existingIndex].status = 'En Ruta';
-                        localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-                        renderPackages();
-                        alert(`Guía ${trackingFound} detectada. Se re-enrutó a 'En Ruta'.`);
-                        return;
-                    }
-                }
-            }
-
-            const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
-            if (nameMatch) document.getElementById('inputName').value = nameMatch[1].trim();
-
-            const phoneMatch = text.match(/\b(\d{10}|\d{3}[\s-]?\d{3}[\s-]?\d{4})\b/);
-            if (phoneMatch) document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
-
-            const upper = text.toUpperCase();
-            const platform = document.getElementById('inputPlatform');
-            if (upper.includes('J&T')) platform.value = 'J&T Express';
-            else if (upper.includes('SHEIN')) platform.value = 'SHEIN';
-            else if (upper.includes('TEMU')) platform.value = 'Temu';
-            else if (upper.includes('TIKTOK')) platform.value = 'TikTok Shop';
-            else if (upper.includes('MERCADO')) platform.value = 'Mercado Libre';
-            else if (upper.includes('AMAZON')) platform.value = 'Amazon';
-        }
-
-        function savePackage(e) {
+        function guardarPaqueteAction(e) {
             e.preventDefault();
 
             const tracking = document.getElementById('inputTracking').value.trim();
@@ -757,24 +534,15 @@
             const phone = document.getElementById('inputPhone').value.trim();
             const platform = document.getElementById('inputPlatform').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
-            
             const account = status === 'Anomalia' ? 'N/A' : document.getElementById('inputAccount').value;
             const resguardoDate = document.getElementById('inputResguardoDate').value || new Date().toISOString().split('T')[0];
 
-            const existingIndex = packages.findIndex(p => p.tracking === tracking);
+            const idx = AppState.packages.findIndex(p => p.tracking === tracking);
 
-            if (existingIndex !== -1) {
-                packages[existingIndex] = {
-                    ...packages[existingIndex],
-                    name,
-                    phone,
-                    platform,
-                    account,
-                    status,
-                    resguardoDate
-                };
+            if (idx !== -1) {
+                AppState.packages[idx] = { ...AppState.packages[idx], name, phone, platform, account, status, resguardoDate };
             } else {
-                packages.unshift({
+                AppState.packages.unshift({
                     id: Date.now().toString(),
                     tracking,
                     name,
@@ -787,48 +555,93 @@
                 });
             }
 
-            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-            renderPackages();
-            updateDashUI();
-            document.getElementById('packageForm').reset();
+            saveStorage();
+            refreshUI();
+
+            document.getElementById('pkgForm').reset();
             document.getElementById('inputResguardoDate').valueAsDate = new Date();
             document.getElementById('imagePreview').classList.add('hidden');
-            handleStatusChange('Entregado');
         }
 
-        function renderPackages() {
-            const body = document.getElementById('packageTableBody');
-            const search = document.getElementById('searchInput').value.toLowerCase();
+        function refreshUI() {
+            // Dashboard
+            document.getElementById('kpiRecibidos').innerText = AppState.shift.newReceived || 0;
+            document.getElementById('kpiReenrutados').innerText = AppState.shift.rerouted || 0;
+            document.getElementById('kpiDamaris').innerText = AppState.shift.damaris || 0;
+            document.getElementById('kpiOskar').innerText = AppState.shift.oskar || 0;
+            document.getElementById('kpiZahori').innerText = AppState.shift.zahori || 0;
+            
+            const resguardosActivos = AppState.packages.filter(p => p.status === 'Resguardo').length;
+            document.getElementById('kpiResguardo').innerText = resguardosActivos;
 
-            let list = [...packages];
+            // Badge
+            const dot = document.getElementById('badgeDot');
+            const txt = document.getElementById('badgeText');
+            const btnAbrir = document.getElementById('btnAbrirTurno');
+            const btnCerrar = document.getElementById('btnCerrarTurno');
 
-            if (currentFilter === 'resguardo') {
+            if (AppState.shift.active) {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                txt.innerText = 'Turno ACTIVO';
+                txt.className = 'text-xs font-bold text-emerald-400';
+                btnAbrir.classList.add('opacity-50', 'cursor-not-allowed');
+                btnAbrir.disabled = true;
+                btnCerrar.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCerrar.disabled = false;
+            } else {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+                txt.innerText = 'Turno CERRADO';
+                txt.className = 'text-xs font-semibold text-slate-300';
+                btnAbrir.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnAbrir.disabled = false;
+                btnCerrar.classList.add('opacity-50', 'cursor-not-allowed');
+                btnCerrar.disabled = true;
+            }
+
+            renderTable();
+        }
+
+        function setFilter(m) {
+            AppState.filter = m;
+            document.getElementById('filterAll').className = m === 'all' 
+                ? "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition"
+                : "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
+            
+            document.getElementById('filterResguardo').className = m === 'resguardo'
+                ? "px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition"
+                : "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const body = document.getElementById('tableBody');
+            const q = document.getElementById('searchInput').value.toLowerCase();
+
+            let list = [...AppState.packages];
+
+            if (AppState.filter === 'resguardo') {
                 list = list.filter(p => p.status === 'Resguardo');
                 list.sort((a, b) => new Date(a.resguardoDate || a.date) - new Date(b.resguardoDate || b.date));
             }
 
             const filtered = list.filter(p => 
-                p.name.toLowerCase().includes(search) || 
-                p.tracking.toLowerCase().includes(search) || 
-                p.phone.includes(search)
+                p.name.toLowerCase().includes(q) || 
+                p.tracking.toLowerCase().includes(q) || 
+                p.phone.includes(q)
             );
 
             if (filtered.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">No hay paquetes cargados. Empieza a registrar nuevos paquetes.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-500">Sin paquetes guardados.</td></tr>`;
                 return;
             }
 
             body.innerHTML = filtered.map(p => {
-                let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                if (p.status === 'En Ruta') badge = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
-                if (p.status === 'Anomalia') badge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                if (p.status === 'Resguardo') badge = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
-                if (p.status === 'Devolucion') badge = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-
-                let statusLabel = p.status;
-                if (p.status === 'Anomalia') statusLabel = 'Anomalía (Sin Cuenta)';
-                if (p.status === 'En Ruta') statusLabel = 'En Ruta (Re-enrutado)';
-                if (p.status === 'Devolucion') statusLabel = 'Devolución / Rechazado';
+                let badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                if (p.status === 'En Ruta') badgeClass = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
+                if (p.status === 'Anomalia') badgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                if (p.status === 'Resguardo') badgeClass = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+                if (p.status === 'Devolucion') badgeClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
 
                 return `
                     <tr class="hover:bg-slate-800/40 transition">
@@ -838,12 +651,12 @@
                         <td class="py-3 px-4 text-xs text-amber-300 font-semibold">${p.resguardoDate || p.date}</td>
                         <td class="py-3 px-4 text-xs text-slate-300 font-semibold">${p.account || 'N/A'}</td>
                         <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">
-                                ${statusLabel}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badgeClass}">
+                                ${p.status}
                             </span>
                         </td>
                         <td class="py-3 px-4 text-right">
-                            <button onclick="deletePkg('${p.id}')" class="text-slate-500 hover:text-rose-400 transition cursor-pointer">
+                            <button onclick="eliminarPaquete('${p.id}')" class="text-slate-500 hover:text-rose-400 transition cursor-pointer">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
@@ -852,30 +665,163 @@
             }).join('');
         }
 
-        function deletePkg(id) {
-            if (confirm('¿Eliminar este paquete del registro?')) {
-                packages = packages.filter(p => p.id !== id);
-                localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-                renderPackages();
-                updateDashUI();
+        function eliminarPaquete(id) {
+            if (confirm('¿Eliminar este paquete?')) {
+                AppState.packages = AppState.packages.filter(p => p.id !== id);
+                saveStorage();
+                refreshUI();
             }
         }
 
-        function saveShiftData() {
-            localStorage.setItem('oskar_shift_data', JSON.stringify(shiftData));
+        function buscarClienteDB() {
+            const q = document.getElementById('dbSearchInput').value.trim().toLowerCase();
+            const box = document.getElementById('dbSearchResult');
+
+            if (q.length < 3) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            const matches = AppState.packages.filter(p => p.name.toLowerCase().includes(q) || p.phone.includes(q));
+
+            if (matches.length === 0) {
+                box.innerHTML = `<p class="text-xs text-slate-400">Sin resultados para esta búsqueda.</p>`;
+                box.classList.remove('hidden');
+                return;
+            }
+
+            const activeResguardos = matches.filter(p => p.status === 'Resguardo');
+            const totalHistorico = matches.length;
+            const clienteNombre = matches[0].name;
+            const clienteTel = matches[0].phone;
+
+            let html = `
+                <div class="flex justify-between items-start border-b border-slate-700/80 pb-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-white">${clienteNombre}</h4>
+                        <p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-xs mr-1"></i>${clienteTel}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400">Total Paquetes:</span>
+                        <div class="text-lg font-bold text-orange-400">${totalHistorico}</div>
+                    </div>
+                </div>
+            `;
+
+            if (activeResguardos.length > 0) {
+                html += `<div class="space-y-2 pt-1"><p class="text-xs font-semibold text-purple-400"> En Resguardo Activo:</p>`;
+                activeResguardos.forEach(p => {
+                    const diffTime = Math.abs(new Date() - new Date(p.resguardoDate || p.date));
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    html += `
+                        <div class="bg-slate-800/90 p-2.5 rounded-lg border border-purple-500/30 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-mono font-bold text-orange-400">${p.tracking}</span>
+                                <span class="text-slate-400 ml-2">(${p.platform})</span>
+                                <div class="text-[11px] text-slate-300">Desde: <strong class="text-white">${p.resguardoDate || p.date}</strong></div>
+                            </div>
+                            <span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                ${diffDays === 0 ? 'Hoy' : `${diffDays} día(s)`}
+                            </span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else {
+                html += `<p class="text-xs text-emerald-400 pt-1"><i class="fa-solid fa-check-circle mr-1"></i> No tiene paquetes en resguardo actualmente.</p>`;
+            }
+
+            box.innerHTML = html;
+            box.classList.remove('hidden');
         }
 
-        function exportCSV() {
-            if (packages.length === 0) return alert('Sin datos para exportar.');
+        function setupOCR() {
+            const cam = document.getElementById('inputCam');
+            const gal = document.getElementById('inputGal');
+
+            const handleFile = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = document.getElementById('imagePreview');
+                    img.src = ev.target.result;
+                    img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                const prog = document.getElementById('ocrProgress');
+                const bar = document.getElementById('ocrBar');
+                const status = document.getElementById('ocrStatus');
+
+                prog.classList.remove('hidden');
+
+                try {
+                    const worker = await Tesseract.createWorker('spa');
+                    worker.setParameters({
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const val = Math.round(m.progress * 100);
+                                bar.style.width = `${val}%`;
+                                document.getElementById('ocrPercent').innerText = `${val}%`;
+                                status.innerText = 'Procesando lectura...';
+                            }
+                        }
+                    });
+
+                    const { data: { text } } = await worker.recognize(file);
+                    await worker.terminate();
+
+                    status.innerText = '¡OCR Lectura lista!';
+                    parseOCR(text);
+                } catch (err) {
+                    console.error(err);
+                    status.innerText = 'Error al leer imagen.';
+                } setTimeout(() => prog.classList.add('hidden'), 3000);
+            };
+
+            cam.onchange = handleFile;
+            gal.onchange = handleFile;
+        }
+
+        function parseOCR(text) {
+            const trackMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
+            if (trackMatch) {
+                const t = trackMatch[0].toUpperCase();
+                document.getElementById('inputTracking').value = t;
+
+                const idx = AppState.packages.findIndex(p => p.tracking === t);
+                if (idx !== -1 && AppState.packages[idx].status === 'Resguardo') {
+                    if (confirm(`El paquete ${t} está 'En Resguardo'. ¿Deseas marcarlo como ENTREGADO?`)) {
+                        AppState.packages[idx].status = 'Entregado';
+                        saveStorage();
+                        refreshUI();
+                        alert(`¡Paquete ${t} entregado!`);
+                        return;
+                    }
+                }
+            }
+
+            const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
+            if (nameMatch) document.getElementById('inputName').value = nameMatch[1].trim();
+
+            const phoneMatch = text.match(/\b(\d{10}|\d{3}[\s-]?\d{3}[\s-]?\d{4})\b/);
+            if (phoneMatch) document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
+        }
+
+        function exportarCSV() {
+            if (AppState.packages.length === 0) return alert('No hay datos para exportar.');
             let csv = 'Tracking,Nombre,Telefono,Plataforma,FechaResguardo,Cuenta,Estado\n';
-            packages.forEach(p => {
+            AppState.packages.forEach(p => {
                 csv += `"${p.tracking}","${p.name}","${p.phone}","${p.platform}","${p.resguardoDate || p.date}","${p.account || ''}","${p.status}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `control_paquetes_resguardos.csv`);
+            a.href = url;
+            a.download = `paqueteria_oskar_macias.csv`;
             a.click();
         }
     </script>
