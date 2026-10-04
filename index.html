@@ -45,14 +45,14 @@
                     <p class="text-xs text-slate-400">Control diario de volumen, cuadre por cuenta y anomalías pendientes de enrutar.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
-                    <button id="btnStartShift" type="button" onclick="openStartShiftModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
+                    <button id="btnStartShift" type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-play"></i> Iniciar Turno
                     </button>
-                    <button id="btnEndShift" type="button" onclick="openEndShiftModal()" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    <button id="btnEndShift" type="button" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
                         <i class="fa-solid fa-flag-checkered"></i> Cuadrar y Cerrar Turno
                     </button>
                     <!-- BOTÓN RESTABLECER DÍA -->
-                    <button id="btnResetDay" type="button" onclick="resetCurrentDay()" class="bg-slate-700 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-rose-800/50 px-3 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Borra los paquetes y datos registrados hoy">
+                    <button id="btnResetDay" type="button" class="bg-slate-700 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-rose-800/50 px-3 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-rotate-right text-rose-400"></i> Restablecer Día
                     </button>
                 </div>
@@ -101,7 +101,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                     <i class="fa-solid fa-magnifying-glass text-xs"></i>
                 </span>
-                <input type="text" id="dbSearchInput" oninput="searchCustomerDB()" placeholder="Ingresa Nombre completo o Número de Teléfono del cliente..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                <input type="text" id="dbSearchInput" placeholder="Ingresa Nombre completo o Número de Teléfono del cliente..." class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
             </div>
 
             <div id="dbSearchResult" class="hidden bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
@@ -147,10 +147,10 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <button type="button" onclick="document.getElementById('imageInputCamera').click()" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <button type="button" id="btnCam" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-camera"></i> Tomar Foto
                     </button>
-                    <button type="button" onclick="document.getElementById('imageInputGallery').click()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <button type="button" id="btnGal" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-images"></i> Abrir Galería
                     </button>
                 </div>
@@ -163,7 +163,7 @@
                     Registro y Clasificación de Paquete
                 </h2>
 
-                <form id="packageForm" onsubmit="savePackage(event)" class="space-y-4">
+                <form id="packageForm" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Número de Guía / Tracking *</label>
@@ -214,25 +214,25 @@
                         <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Registro *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-                                <input type="radio" name="statusOption" value="Entregado" checked onchange="handleStatusChange('Entregado')" class="hidden">
+                                <input type="radio" name="statusOption" value="Entregado" checked class="hidden">
                                 <i class="fa-solid fa-circle-check text-emerald-400"></i>
                                 <span class="text-xs font-medium text-slate-200">Entregado</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
-                                <input type="radio" name="statusOption" value="Anomalia" onchange="handleStatusChange('Anomalia')" class="hidden">
+                                <input type="radio" name="statusOption" value="Anomalia" class="hidden">
                                 <i class="fa-solid fa-truck-ramp-box text-amber-400"></i>
                                 <span class="text-xs font-medium text-slate-200 text-center">Anomalía (Sin Cuenta)</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
-                                <input type="radio" name="statusOption" value="Resguardo" onchange="handleStatusChange('Resguardo')" class="hidden">
+                                <input type="radio" name="statusOption" value="Resguardo" class="hidden">
                                 <i class="fa-solid fa-warehouse text-indigo-400"></i>
                                 <span class="text-xs font-medium text-slate-200">En Resguardo</span>
                             </label>
 
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
-                                <input type="radio" name="statusOption" value="Devolucion" onchange="handleStatusChange('Devolucion')" class="hidden">
+                                <input type="radio" name="statusOption" value="Devolucion" class="hidden">
                                 <i class="fa-solid fa-rotate-left text-rose-400"></i>
                                 <span class="text-xs font-medium text-slate-200 text-center">Devolución / Rechazo</span>
                             </label>
@@ -258,11 +258,11 @@
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <button onclick="setFilterMode('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition">Todos</button>
-                    <button onclick="setFilterMode('resguardo')" id="btnFilterResguardo" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition">Solo Resguardos</button>
+                    <button id="btnFilterAll" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white transition">Todos</button>
+                    <button id="btnFilterResguardo" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition">Solo Resguardos</button>
                     
-                    <input type="text" id="searchInput" oninput="renderPackages()" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
-                    <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                    <input type="text" id="searchInput" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                    <button id="btnExport" type="button" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
                         <i class="fa-solid fa-file-csv"></i> Exportar
                     </button>
                 </div>
@@ -304,8 +304,8 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeStartShiftModal()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
-                <button type="button" onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
+                <button type="button" id="btnCancelStart" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
+                <button type="button" id="btnConfirmStart" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
             </div>
         </div>
     </div>
@@ -327,15 +327,15 @@
                 <div class="grid grid-cols-1 gap-3 pt-2">
                     <div>
                         <label class="block text-xs font-medium text-sky-400 mb-1">Entregados Cuenta Damaris</label>
-                        <input type="number" id="closeDamaris" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-sky-500">
+                        <input type="number" id="closeDamaris" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-emerald-400 mb-1">Entregados Cuenta Oskar</label>
-                        <input type="number" id="closeOskar" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <input type="number" id="closeOskar" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-indigo-400 mb-1">Entregados Cuenta Zahori</label>
-                        <input type="number" id="closeZahori" min="0" value="0" oninput="calculateBalance()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <input type="number" id="closeZahori" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
 
@@ -352,78 +352,164 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeEndShiftModal()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
-                <button type="button" onclick="confirmEndShift()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
+                <button type="button" id="btnCancelEnd" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Volver</button>
+                <button type="button" id="btnConfirmEnd" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold">Cerrar Turno Definitivo</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL -->
+    <!-- SCRIPT PRINCIPAL OPTIMIZADO -->
     <script>
-        let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
-            active: false,
-            newReceived: 0,
-            rerouted: 0,
-            damaris: 0,
-            oskar: 0,
-            zahori: 0,
-            anomalies: 0
-        };
-
-        let packages = JSON.parse(localStorage.getItem('oskar_packages_list')) || [];
+        // Variables globales
+        let shiftData = { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 };
+        let packages = [];
         let currentFilter = 'all';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Carga inicial
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const savedShift = localStorage.getItem('oskar_shift_data');
+                if (savedShift) shiftData = JSON.parse(savedShift);
+                
+                const savedPkgs = localStorage.getItem('oskar_packages_list');
+                if (savedPkgs) packages = JSON.parse(savedPkgs);
+            } catch (e) {
+                console.error("Error leyendo datos", e);
+            }
+
             document.getElementById('inputResguardoDate').valueAsDate = new Date();
+            
+            bindEvents();
             updateDashUI();
             renderPackages();
             setupOCR();
         });
 
-        function openStartShiftModal() {
-            document.getElementById('modalStartShift').classList.remove('hidden');
+        function bindEvents() {
+            // Botones de turno
+            document.getElementById('btnStartShift').addEventListener('click', () => {
+                document.getElementById('modalStartShift').classList.remove('hidden');
+            });
+
+            document.getElementById('btnCancelStart').addEventListener('click', () => {
+                document.getElementById('modalStartShift').classList.add('hidden');
+            });
+
+            document.getElementById('btnConfirmStart').addEventListener('click', confirmStartShift);
+
+            document.getElementById('btnEndShift').addEventListener('click', () => {
+                if (!shiftData.active) return;
+                const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
+                document.getElementById('closeTotalReceived').innerText = totalInRoute;
+                calculateBalance();
+                document.getElementById('modalEndShift').classList.remove('hidden');
+            });
+
+            document.getElementById('btnCancelEnd').addEventListener('click', () => {
+                document.getElementById('modalEndShift').classList.add('hidden');
+            });
+
+            document.getElementById('btnConfirmEnd').addEventListener('click', confirmEndShift);
+
+            // Botón restablecer día
+            document.getElementById('btnResetDay').addEventListener('click', resetCurrentDay);
+
+            // Inputs de cierre
+            document.getElementById('closeDamaris').addEventListener('input', calculateBalance);
+            document.getElementById('closeOskar').addEventListener('input', calculateBalance);
+            document.getElementById('closeZahori').addEventListener('input', calculateBalance);
+
+            // Cam / Galería
+            document.getElementById('btnCam').addEventListener('click', () => document.getElementById('imageInputCamera').click());
+            document.getElementById('btnGal').addEventListener('click', () => document.getElementById('imageInputGallery').click());
+
+            // Filtros tabla
+            document.getElementById('btnFilterAll').addEventListener('click', () => setFilterMode('all'));
+            document.getElementById('btnFilterResguardo').addEventListener('click', () => setFilterMode('resguardo'));
+            document.getElementById('searchInput').addEventListener('input', renderPackages);
+            document.getElementById('btnExport').addEventListener('click', exportCSV);
+
+            // Búsqueda BD
+            document.getElementById('dbSearchInput').addEventListener('input', searchCustomerDB);
+
+            // Formulario de guardar paquete
+            document.getElementById('packageForm').addEventListener('submit', savePackage);
+
+            // Radio de anomalía
+            document.querySelectorAll('input[name="statusOption"]').forEach(radio => {
+                radio.addEventListener('change', (e) => handleStatusChange(e.target.value));
+            });
         }
 
-        function closeStartShiftModal() {
+        function confirmStartShift() {
+            const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
+            const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
+
+            packages = packages.map(p => {
+                if (p.status === 'Anomalia') return { ...p, status: 'En Ruta' };
+                return p;
+            });
+            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+
+            shiftData = {
+                active: true,
+                newReceived: newAmount,
+                rerouted: reroutedCount,
+                damaris: 0,
+                oskar: 0,
+                zahori: 0,
+                anomalies: 0
+            };
+
+            saveShiftData();
             document.getElementById('modalStartShift').classList.add('hidden');
+            updateDashUI();
+            renderPackages();
         }
 
-        function openEndShiftModal() {
-            if (!shiftData.active) return;
-            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
-            document.getElementById('closeTotalReceived').innerText = totalInRoute;
-            calculateBalance();
-            document.getElementById('modalEndShift').classList.remove('hidden');
+        function calculateBalance() {
+            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
+            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
+
+            const totalDelivered = damaris + oskar + zahori;
+            const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
+            const anomalies = Math.max(0, totalInRoute - totalDelivered);
+
+            document.getElementById('closeTotalDelivered').innerText = totalDelivered;
+            document.getElementById('closeAnomalies').innerText = anomalies;
         }
 
-        function closeEndShiftModal() {
+        function confirmEndShift() {
+            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
+            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
+            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
+
+            const totalInRoute = (shiftData.newReceived || 0) + (shiftData.rerouted || 0);
+            shiftData.damaris = damaris;
+            shiftData.oskar = oskar;
+            shiftData.zahori = zahori;
+            shiftData.anomalies = Math.max(0, totalInRoute - (damaris + oskar + zahori));
+            shiftData.active = false;
+
+            saveShiftData();
             document.getElementById('modalEndShift').classList.add('hidden');
+            updateDashUI();
+            alert(`Turno cerrado. Entregados: ${damaris + oskar + zahori}. Anomalías guardadas: ${shiftData.anomalies}`);
         }
 
-        // RESTABLECER TODO LO HECHO EN EL DÍA
         function resetCurrentDay() {
-            if (confirm("¿Estás seguro de que deseas restablecer el día? Esto borrará el conteo del turno actual y eliminará los paquetes registrados hoy.")) {
+            if (confirm("¿Estás seguro de que deseas restablecer el día? Esto desactivará el turno y limpiará los paquetes registrados hoy.")) {
                 const todayStr = new Date().toLocaleDateString();
-                
-                // Conservar solo resguardos o paquetes anteriores a hoy
                 packages = packages.filter(p => p.date !== todayStr);
                 localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
 
-                // Reiniciar estado del turno
-                shiftData = {
-                    active: false,
-                    newReceived: 0,
-                    rerouted: 0,
-                    damaris: 0,
-                    oskar: 0,
-                    zahori: 0,
-                    anomalies: 0
-                };
+                shiftData = { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 };
                 saveShiftData();
 
                 updateDashUI();
                 renderPackages();
-                alert("El día ha sido restablecido con éxito.");
+                alert("El día ha sido restablecido exitosamente.");
             }
         }
 
@@ -438,6 +524,40 @@
             }
         }
 
+        function updateDashUI() {
+            document.getElementById('dashReceived').innerText = shiftData.newReceived || 0;
+            document.getElementById('dashRerouted').innerText = shiftData.rerouted || 0;
+            document.getElementById('dashDamaris').innerText = shiftData.damaris || 0;
+            document.getElementById('dashOskar').innerText = shiftData.oskar || 0;
+            document.getElementById('dashZahori').innerText = shiftData.zahori || 0;
+            
+            const activeResguardosCount = packages.filter(p => p.status === 'Resguardo').length;
+            document.getElementById('dashResguardoTotal').innerText = activeResguardosCount;
+
+            const dot = document.getElementById('shiftStatusDot');
+            const text = document.getElementById('shiftStatusText');
+            const btnStart = document.getElementById('btnStartShift');
+            const btnEnd = document.getElementById('btnEndShift');
+
+            if (shiftData.active) {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                text.innerText = 'Turno ACTIVO';
+                text.className = 'text-emerald-400 font-bold';
+                btnStart.classList.add('opacity-50', 'cursor-not-allowed');
+                btnStart.disabled = true;
+                btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnEnd.disabled = false;
+            } else {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+                text.innerText = 'Turno CERRADO';
+                text.className = 'text-slate-300 font-medium';
+                btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnStart.disabled = false;
+                btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
+                btnEnd.disabled = true;
+            }
+        }
+
         function searchCustomerDB() {
             const query = document.getElementById('dbSearchInput').value.trim().toLowerCase();
             const resultBox = document.getElementById('dbSearchResult');
@@ -447,9 +567,7 @@
                 return;
             }
 
-            const matches = packages.filter(p => 
-                (p.name.toLowerCase().includes(query) || p.phone.includes(query))
-            );
+            const matches = packages.filter(p => (p.name.toLowerCase().includes(query) || p.phone.includes(query)));
 
             if (matches.length === 0) {
                 resultBox.innerHTML = `<p class="text-xs text-slate-400">No se encontraron registros para este cliente o teléfono.</p>`;
@@ -534,99 +652,6 @@
                 btnAll.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition";
             }
             renderPackages();
-        }
-
-        function confirmStartShift() {
-            const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
-            const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
-
-            packages = packages.map(p => {
-                if (p.status === 'Anomalia') {
-                    return { ...p, status: 'En Ruta' };
-                }
-                return p;
-            });
-            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
-
-            shiftData = {
-                active: true,
-                newReceived: newAmount,
-                rerouted: reroutedCount,
-                damaris: 0,
-                oskar: 0,
-                zahori: 0,
-                anomalies: 0
-            };
-
-            saveShiftData();
-            closeStartShiftModal();
-            updateDashUI();
-            renderPackages();
-        }
-
-        function calculateBalance() {
-            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
-            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
-
-            const totalDelivered = damaris + oskar + zahori;
-            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
-            const anomalies = Math.max(0, totalInRoute - totalDelivered);
-
-            document.getElementById('closeTotalDelivered').innerText = totalDelivered;
-            document.getElementById('closeAnomalies').innerText = anomalies;
-        }
-
-        function confirmEndShift() {
-            const damaris = parseInt(document.getElementById('closeDamaris').value) || 0;
-            const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
-            const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
-
-            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
-            shiftData.damaris = damaris;
-            shiftData.oskar = oskar;
-            shiftData.zahori = zahori;
-            shiftData.anomalies = Math.max(0, totalInRoute - (damaris + oskar + zahori));
-            shiftData.active = false;
-
-            saveShiftData();
-            closeEndShiftModal();
-            updateDashUI();
-            alert(`Turno cerrado. Entregados: ${damaris + oskar + zahori}. Anomalías guardadas: ${shiftData.anomalies}`);
-        }
-
-        function updateDashUI() {
-            document.getElementById('dashReceived').innerText = shiftData.newReceived;
-            document.getElementById('dashRerouted').innerText = shiftData.rerouted;
-            document.getElementById('dashDamaris').innerText = shiftData.damaris;
-            document.getElementById('dashOskar').innerText = shiftData.oskar;
-            document.getElementById('dashZahori').innerText = shiftData.zahori;
-            
-            const activeResguardosCount = packages.filter(p => p.status === 'Resguardo').length;
-            document.getElementById('dashResguardoTotal').innerText = activeResguardosCount;
-
-            const dot = document.getElementById('shiftStatusDot');
-            const text = document.getElementById('shiftStatusText');
-            const btnStart = document.getElementById('btnStartShift');
-            const btnEnd = document.getElementById('btnEndShift');
-
-            if (shiftData.active) {
-                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
-                text.innerText = 'Turno ACTIVO';
-                text.className = 'text-emerald-400 font-bold';
-                btnStart.classList.add('opacity-50', 'cursor-not-allowed');
-                btnStart.disabled = true;
-                btnEnd.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnEnd.disabled = false;
-            } else {
-                dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
-                text.innerText = 'Turno CERRADO';
-                text.className = 'text-slate-300 font-medium';
-                btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnStart.disabled = false;
-                btnEnd.classList.add('opacity-50', 'cursor-not-allowed');
-                btnEnd.disabled = true;
-            }
         }
 
         function setupOCR() {
@@ -818,7 +843,7 @@
                             </span>
                         </td>
                         <td class="py-3 px-4 text-right">
-                            <button onclick="deletePkg('${p.id}')" class="text-slate-500 hover:text-rose-400 transition">
+                            <button onclick="deletePkg('${p.id}')" class="text-slate-500 hover:text-rose-400 transition cursor-pointer">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
