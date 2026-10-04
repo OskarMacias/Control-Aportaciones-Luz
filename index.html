@@ -22,7 +22,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white">Control de Paquetería</h1>
-                    <p class="text-xs text-slate-400">Gestión de Turnos, Cuentas & OCR de Guías</p>
+                    <p class="text-xs text-slate-400">Gestión de Turnos, Cuentas & Re-enrutado Automático</p>
                 </div>
             </div>
             <div id="shiftBadge" class="flex items-center gap-2 text-xs bg-slate-700/50 px-3 py-1.5 rounded-full border border-slate-600">
@@ -42,7 +42,7 @@
                         <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
                         Apertura y Cierre de Turno Diario
                     </h2>
-                    <p class="text-xs text-slate-400">Registra el total de paquetes recibidos al iniciar y cuadra las entregas por cuenta al finalizar.</p>
+                    <p class="text-xs text-slate-400">Ingresa paquetes nuevos al abrir turno. Las anomalías del día anterior se re-enrutan automáticamente.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btnStartShift" onclick="toggleShiftModal('start')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-2">
@@ -55,55 +55,57 @@
             </div>
 
             <!-- Resumen Visual del Turno Actual -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Recibidos Turno</span>
-                    <div class="text-2xl font-bold text-white mt-1" id="dashReceived">0</div>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-slate-400 uppercase">Recibidos Nuevos</span>
+                    <div class="text-xl font-bold text-white mt-1" id="dashReceived">0</div>
                 </div>
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Damaris</span>
-                    <div class="text-2xl font-bold text-sky-400 mt-1" id="dashDamaris">0</div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-amber-400 uppercase">Re-enrutados (Anomalías)</span>
+                    <div class="text-xl font-bold text-amber-400 mt-1" id="dashRerouted">0</div>
                 </div>
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Oskar</span>
-                    <div class="text-2xl font-bold text-emerald-400 mt-1" id="dashOskar">0</div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-sky-400 uppercase">Cuenta Damaris</span>
+                    <div class="text-xl font-bold text-sky-400 mt-1" id="dashDamaris">0</div>
                 </div>
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Cuenta Zahori</span>
-                    <div class="text-2xl font-bold text-indigo-400 mt-1" id="dashZahori">0</div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-emerald-400 uppercase">Cuenta Oskar</span>
+                    <div class="text-xl font-bold text-emerald-400 mt-1" id="dashOskar">0</div>
                 </div>
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700 col-span-2 md:col-span-1">
-                    <span class="text-xs font-medium text-slate-400 uppercase">Anomalías / Faltantes</span>
-                    <div class="text-2xl font-bold text-amber-400 mt-1" id="dashAnomalies">0</div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                    <span class="text-[10px] font-medium text-indigo-400 uppercase">Cuenta Zahori</span>
+                    <div class="text-xl font-bold text-indigo-400 mt-1" id="dashZahori">0</div>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 col-span-2 md:col-span-1">
+                    <span class="text-[10px] font-medium text-rose-400 uppercase">Devoluciones / Rechazo</span>
+                    <div class="text-xl font-bold text-rose-400 mt-1" id="dashDevoluciones">0</div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. CAPTURA OCR DE PAQUETES / FOTOS DE GUÍAS -->
+        <!-- 2. CAPTURA OCR DE PAQUETES / ESCÁNER EN RUTA -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Zona de Carga de Imagen con Selección Directa Galería / Cámara -->
+            <!-- Carga de Imagen y Escáner -->
             <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
-                        Escanear Foto de Guía / INE
+                        Escanear Guía / INE
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Elige tomar una foto directa o selecciona una imagen almacenada en tu galería.</p>
+                    <p class="text-xs text-slate-400 mb-4">Si escaneas una guía con anomalía previa, el sistema la re-enruta automáticamente a **En Reparto**.</p>
 
-                    <!-- Inputs ocultos independientes -->
                     <input type="file" id="imageInputGallery" accept="image/*" class="hidden">
                     <input type="file" id="imageInputCamera" accept="image/*" capture="environment" class="hidden">
 
-                    <!-- Vista previa -->
                     <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center transition bg-slate-900/50 relative overflow-hidden min-h-[180px] flex flex-col items-center justify-center">
                         <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/80 backdrop-blur" alt="Vista previa">
                         
                         <div id="dropzoneText" class="space-y-2">
                             <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
-                                <i class="fa-solid fa-image text-xl"></i>
+                                <i class="fa-solid fa-barcode text-xl"></i>
                             </div>
-                            <p class="text-xs font-medium text-slate-300">Selecciona el origen de la foto de la guía</p>
+                            <p class="text-xs font-medium text-slate-300">Escanea la guía para re-enrutar o registrar</p>
                         </div>
                     </div>
 
@@ -119,7 +121,6 @@
                     </div>
                 </div>
 
-                <!-- Botones duales independientes -->
                 <div class="grid grid-cols-2 gap-3 pt-2">
                     <button type="button" onclick="document.getElementById('imageInputCamera').click()" class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-camera"></i> Tomar Foto
@@ -130,11 +131,11 @@
                 </div>
             </div>
 
-            <!-- Formulario de Registro Individual -->
+            <!-- Formulario de Registro / Modificación -->
             <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-orange-400"></i>
-                    Registro de Paquete / Estado
+                    Registro de Paquete / Clasificación
                 </h2>
 
                 <form id="packageForm" onsubmit="savePackage(event)" class="space-y-4">
@@ -177,7 +178,7 @@
                         </div>
                     </div>
 
-                    <!-- Clasificación / Tipo de Registro -->
+                    <!-- Estados de Registro -->
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-2">Estado del Registro *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -187,22 +188,22 @@
                                 <span class="text-xs font-medium text-slate-200">Entregado</span>
                             </label>
 
+                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
+                                <input type="radio" name="statusOption" value="Anomalia" class="hidden">
+                                <i class="fa-solid fa-truck-ramp-box text-amber-400"></i>
+                                <span class="text-xs font-medium text-slate-200 text-center">Anomalía (No Entregado)</span>
+                            </label>
+
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-indigo-500 transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
                                 <input type="radio" name="statusOption" value="Resguardo" class="hidden">
                                 <i class="fa-solid fa-warehouse text-indigo-400"></i>
                                 <span class="text-xs font-medium text-slate-200">En Resguardo</span>
                             </label>
 
-                            <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/30">
-                                <input type="radio" name="statusOption" value="Faltante" class="hidden">
-                                <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-                                <span class="text-xs font-medium text-slate-200">Faltante / Anomalía</span>
-                            </label>
-
                             <label class="cursor-pointer border border-slate-700 rounded-xl p-3 bg-slate-900 flex flex-col items-center gap-1 hover:border-rose-500 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-950/30">
                                 <input type="radio" name="statusOption" value="Devolucion" class="hidden">
                                 <i class="fa-solid fa-rotate-left text-rose-400"></i>
-                                <span class="text-xs font-medium text-slate-200">Devolución</span>
+                                <span class="text-xs font-medium text-slate-200 text-center">Devolución / Rechazado</span>
                             </label>
                         </div>
                     </div>
@@ -220,9 +221,9 @@
                 <div>
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                         <i class="fa-solid fa-list text-orange-400"></i>
-                        Bitácora General de Paquetes
+                        Bitácora General y Estado de Reparto
                     </h2>
-                    <p class="text-xs text-slate-400">Registro histórico de entregas, resguardos y faltantes.</p>
+                    <p class="text-xs text-slate-400">Seguimiento de entregas, re-enrutados en ruta y devoluciones.</p>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <input type="text" id="searchInput" oninput="renderPackages()" placeholder="Buscar por cliente o guía..." class="bg-slate-900 border border-slate-700 rounded-xl py-1.5 px-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 w-full sm:w-64">
@@ -260,11 +261,20 @@
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-box-open text-orange-400"></i> Iniciar Nuevo Turno Diario
             </h3>
-            <p class="text-xs text-slate-400">Ingresa la cantidad total de paquetes que llegaron a recolección al abrir la jornada.</p>
-            <div>
-                <label class="block text-xs font-medium text-slate-300 mb-1">Cantidad de Paquetes Recibidos *</label>
-                <input type="number" id="inputStartAmount" min="1" placeholder="Ej. 200" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+            <p class="text-xs text-slate-400">Ingresa paquetes nuevos recibidos hoy. Las anomalías no entregadas de ayer se sumarán automáticamente a tu inventario.</p>
+            
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <div class="flex justify-between text-xs text-amber-400">
+                    <span>Anomalías re-enrutadas (ayer):</span>
+                    <span id="modalReroutedCount" class="font-bold">0</span>
+                </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Paquetes Nuevos Recibidos Hoy *</label>
+                <input type="number" id="inputStartAmount" min="0" placeholder="Ej. 200" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+            </div>
+            
             <div class="flex justify-end gap-3 pt-2">
                 <button onclick="toggleShiftModal('start')" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancelar</button>
                 <button onclick="confirmStartShift()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold">Iniciar Turno</button>
@@ -278,11 +288,11 @@
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-calculator text-orange-400"></i> Cuadre y Cierre de Turno
             </h3>
-            <p class="text-xs text-slate-400">Ingresa las entregas realizadas repartidas entre tus diferentes cuentas.</p>
+            <p class="text-xs text-slate-400">Ingresa las entregas por cuenta. Las diferencias se registrarán como anomalías para re-enrutar mañana.</p>
             
             <div class="space-y-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700">
                 <div class="flex justify-between text-xs text-slate-300 font-medium">
-                    <span>Paquetes Recibidos:</span>
+                    <span>Total Paquetes en Ruta Hoy:</span>
                     <span id="closeTotalReceived" class="font-bold text-white">0</span>
                 </div>
                 
@@ -307,15 +317,10 @@
                         <span id="closeTotalDelivered" class="font-bold text-emerald-400">0</span>
                     </div>
                     <div class="flex justify-between text-xs text-slate-300">
-                        <span>Faltantes / Anomalías:</span>
+                        <span>Anomalías No Entregadas (Pasan a mañana):</span>
                         <span id="closeAnomalies" class="font-bold text-amber-400">0</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Aviso si hay faltantes -->
-            <div id="anomalyWarning" class="hidden bg-amber-950/40 border border-amber-700/60 p-3 rounded-xl text-xs text-amber-200">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Detectamos faltantes en el cuadre. Recuerda registrar o escanear la foto de la guía de los paquetes faltantes en la bitácora.
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
@@ -327,14 +332,15 @@
 
     <!-- LOGICA JS -->
     <script>
-        // Estado local persistente
         let shiftData = JSON.parse(localStorage.getItem('oskar_shift_data')) || {
             active: false,
-            received: 0,
+            newReceived: 0,
+            rerouted: 0,
             damaris: 0,
             oskar: 0,
             zahori: 0,
-            anomalies: 0
+            anomalies: 0,
+            devoluciones: 0
         };
 
         let packages = JSON.parse(localStorage.getItem('oskar_packages_list')) || [];
@@ -347,31 +353,46 @@
 
         function toggleShiftModal(type) {
             if (type === 'start') {
+                const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
+                document.getElementById('modalReroutedCount').innerText = reroutedCount;
                 document.getElementById('modalStartShift').classList.toggle('hidden');
             } else if (type === 'end') {
                 if (!shiftData.active) return;
-                document.getElementById('closeTotalReceived').innerText = shiftData.received;
+                const totalInRoute = shiftData.newReceived + shiftData.rerouted;
+                document.getElementById('closeTotalReceived').innerText = totalInRoute;
                 calculateBalance();
                 document.getElementById('modalEndShift').classList.toggle('hidden');
             }
         }
 
         function confirmStartShift() {
-            const amount = parseInt(document.getElementById('inputStartAmount').value);
-            if (!amount || amount <= 0) return alert('Ingresa un número válido de paquetes.');
+            const newAmount = parseInt(document.getElementById('inputStartAmount').value) || 0;
+            const reroutedCount = packages.filter(p => p.status === 'Anomalia' || p.status === 'En Ruta').length;
+
+            // Re-enrutar automáticamente paquetes con anomalías previas
+            packages = packages.map(p => {
+                if (p.status === 'Anomalia') {
+                    return { ...p, status: 'En Ruta' };
+                }
+                return p;
+            });
+            localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
 
             shiftData = {
                 active: true,
-                received: amount,
+                newReceived: newAmount,
+                rerouted: reroutedCount,
                 damaris: 0,
                 oskar: 0,
                 zahori: 0,
-                anomalies: 0
+                anomalies: 0,
+                devoluciones: packages.filter(p => p.status === 'Devolucion').length
             };
 
             saveShiftData();
             toggleShiftModal('start');
             updateDashUI();
+            renderPackages();
         }
 
         function calculateBalance() {
@@ -380,17 +401,11 @@
             const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
 
             const totalDelivered = damaris + oskar + zahori;
-            const anomalies = Math.max(0, shiftData.received - totalDelivered);
+            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
+            const anomalies = Math.max(0, totalInRoute - totalDelivered);
 
             document.getElementById('closeTotalDelivered').innerText = totalDelivered;
             document.getElementById('closeAnomalies').innerText = anomalies;
-
-            const anomalyWarning = document.getElementById('anomalyWarning');
-            if (anomalies > 0) {
-                anomalyWarning.classList.remove('hidden');
-            } else {
-                anomalyWarning.classList.add('hidden');
-            }
         }
 
         function confirmEndShift() {
@@ -398,24 +413,26 @@
             const oskar = parseInt(document.getElementById('closeOskar').value) || 0;
             const zahori = parseInt(document.getElementById('closeZahori').value) || 0;
 
+            const totalInRoute = shiftData.newReceived + shiftData.rerouted;
             shiftData.damaris = damaris;
             shiftData.oskar = oskar;
             shiftData.zahori = zahori;
-            shiftData.anomalies = Math.max(0, shiftData.received - (damaris + oskar + zahori));
+            shiftData.anomalies = Math.max(0, totalInRoute - (damaris + oskar + zahori));
             shiftData.active = false;
 
             saveShiftData();
             toggleShiftModal('end');
             updateDashUI();
-            alert(`Turno cerrado con éxito. Total entregados: ${damaris + oskar + zahori}. Faltantes: ${shiftData.anomalies}`);
+            alert(`Turno cerrado. Total en ruta: ${totalInRoute}. Entregados: ${damaris + oskar + zahori}. Anomalías que re-enrutan mañana: ${shiftData.anomalies}`);
         }
 
         function updateDashUI() {
-            document.getElementById('dashReceived').innerText = shiftData.received;
+            document.getElementById('dashReceived').innerText = shiftData.newReceived;
+            document.getElementById('dashRerouted').innerText = shiftData.rerouted;
             document.getElementById('dashDamaris').innerText = shiftData.damaris;
             document.getElementById('dashOskar').innerText = shiftData.oskar;
             document.getElementById('dashZahori').innerText = shiftData.zahori;
-            document.getElementById('dashAnomalies').innerText = shiftData.anomalies;
+            document.getElementById('dashDevoluciones').innerText = packages.filter(p => p.status === 'Devolucion').length;
 
             const dot = document.getElementById('shiftStatusDot');
             const text = document.getElementById('shiftStatusText');
@@ -439,7 +456,6 @@
             }
         }
 
-        // Manejo OCR independiente para Galería y Cámara
         function setupOCR() {
             const galleryInput = document.getElementById('imageInputGallery');
             const cameraInput = document.getElementById('imageInputCamera');
@@ -459,7 +475,6 @@
                 const ocrProgress = document.getElementById('ocrProgress');
                 const ocrBar = document.getElementById('ocrBar');
                 const ocrStatus = document.getElementById('ocrStatus');
-                const ocrPercent = document.getElementById('ocrPercent');
 
                 ocrProgress.classList.remove('hidden');
 
@@ -470,8 +485,8 @@
                             if (m.status === 'recognizing text') {
                                 const progress = Math.round(m.progress * 100);
                                 ocrBar.style.width = `${progress}%`;
-                                ocrPercent.innerText = `${progress}%`;
-                                ocrStatus.innerText = 'Procesando texto de guía...';
+                                document.getElementById('ocrPercent').innerText = `${progress}%`;
+                                ocrStatus.innerText = 'Buscando número de guía...';
                             }
                         }
                     });
@@ -483,7 +498,7 @@
                     parseOCRText(text);
                 } catch (err) {
                     console.error(err);
-                    ocrStatus.innerText = 'Error al leer imagen. Ingresa los datos manualmente.';
+                    ocrStatus.innerText = 'Error de lectura. Ingresa manualmente.';
                 } setTimeout(() => ocrProgress.classList.add('hidden'), 3000);
             };
 
@@ -493,7 +508,21 @@
 
         function parseOCRText(text) {
             const trackingMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
-            if (trackingMatch) document.getElementById('inputTracking').value = trackingMatch[0].toUpperCase();
+            if (trackingMatch) {
+                const trackingFound = trackingMatch[0].toUpperCase();
+                document.getElementById('inputTracking').value = trackingFound;
+
+                // Verificar si es un paquete con anomalía previa para re-enrutar al instante
+                const existingIndex = packages.findIndex(p => p.tracking === trackingFound);
+                if (existingIndex !== -1) {
+                    if (packages[existingIndex].status === 'Anomalia') {
+                        packages[existingIndex].status = 'En Ruta';
+                        localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
+                        renderPackages();
+                        alert(`¡Guía ${trackingFound} detectada! Se re-enrutó automáticamente a 'En Ruta'.`);
+                    }
+                }
+            }
 
             const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
             if (nameMatch) document.getElementById('inputName').value = nameMatch[1].trim();
@@ -521,19 +550,34 @@
             const account = document.getElementById('inputAccount').value;
             const status = document.querySelector('input[name="statusOption"]:checked').value;
 
-            packages.unshift({
-                id: Date.now().toString(),
-                tracking,
-                name,
-                phone,
-                platform,
-                account,
-                status,
-                date: new Date().toLocaleDateString()
-            });
+            const existingIndex = packages.findIndex(p => p.tracking === tracking);
+
+            if (existingIndex !== -1) {
+                packages[existingIndex] = {
+                    ...packages[existingIndex],
+                    name,
+                    phone,
+                    platform,
+                    account,
+                    status,
+                    date: new Date().toLocaleDateString()
+                };
+            } else {
+                packages.unshift({
+                    id: Date.now().toString(),
+                    tracking,
+                    name,
+                    phone,
+                    platform,
+                    account,
+                    status,
+                    date: new Date().toLocaleDateString()
+                });
+            }
 
             localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
             renderPackages();
+            updateDashUI();
             document.getElementById('packageForm').reset();
             document.getElementById('imagePreview').classList.add('hidden');
         }
@@ -555,9 +599,15 @@
 
             body.innerHTML = filtered.map(p => {
                 let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                if (p.status === 'En Ruta') badge = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
+                if (p.status === 'Anomalia') badge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
                 if (p.status === 'Resguardo') badge = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
-                if (p.status === 'Faltante') badge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
                 if (p.status === 'Devolucion') badge = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+
+                let statusLabel = p.status;
+                if (p.status === 'Anomalia') statusLabel = 'Anomalía (No Entregado)';
+                if (p.status === 'En Ruta') statusLabel = 'En Ruta (Re-enrutado)';
+                if (p.status === 'Devolucion') statusLabel = 'Devolución / Rechazado';
 
                 return `
                     <tr class="hover:bg-slate-800/40 transition">
@@ -568,7 +618,7 @@
                         <td class="py-3 px-4 text-xs text-slate-300 font-semibold">${p.account || 'N/A'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">
-                                ${p.status}
+                                ${statusLabel}
                             </span>
                         </td>
                         <td class="py-3 px-4 text-right">
@@ -586,6 +636,7 @@
                 packages = packages.filter(p => p.id !== id);
                 localStorage.setItem('oskar_packages_list', JSON.stringify(packages));
                 renderPackages();
+                updateDashUI();
             }
         }
 
