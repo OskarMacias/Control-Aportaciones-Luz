@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tesseract.js para OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased pb-12">
 
@@ -107,13 +105,11 @@
                 </div>
                 
                 <div class="flex gap-2">
-                    <!-- Botón Cámara directo -->
                     <label class="bg-orange-600 hover:bg-orange-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-camera"></i> Escanear Guía
                         <input type="file" id="searchCamInput" accept="image/*" capture="environment" class="hidden">
                     </label>
                     
-                    <!-- Botón Galería directo -->
                     <label class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-images"></i> Galería
                         <input type="file" id="searchGalInput" accept="image/*" class="hidden">
@@ -121,15 +117,9 @@
                 </div>
             </div>
 
-            <!-- Progreso OCR de la Búsqueda -->
-            <div id="searchOcrProgress" class="hidden space-y-1 bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                <div class="flex justify-between text-xs text-slate-300">
-                    <span id="searchOcrStatus">Leyendo guía...</span>
-                    <span id="searchOcrPercent">0%</span>
-                </div>
-                <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                    <div id="searchOcrBar" class="bg-orange-500 h-full w-0 transition-all duration-300"></div>
-                </div>
+            <!-- Preview imagen búsqueda -->
+            <div id="searchImgContainer" class="hidden relative w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-slate-700">
+                <img id="searchPreviewImg" class="w-full h-full object-contain" alt="Vista previa búsqueda">
             </div>
 
             <div id="dbSearchResult" class="hidden bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
@@ -137,47 +127,35 @@
             </div>
         </section>
 
-        <!-- 3. SECCIÓN: OCR Y REGISTRO DE PAQUETES -->
+        <!-- 3. SECCIÓN: ESCÁNER Y REGISTRO DE PAQUETES -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- OCR / Escáner de Registro -->
+            <!-- Escáner / Captura de Imagen -->
             <div class="lg:col-span-5 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-camera text-orange-400"></i>
-                        Escáner de Guía / OCR (Registro)
+                        Escáner de Guía (Registro)
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Escanea etiquetas para autocompletar el formulario o marcar paquetes como Entregados.</p>
+                    <p class="text-xs text-slate-400 mb-4">Captura la foto para autocompletar o confirmar entregas en resguardo.</p>
 
-                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center bg-slate-900/50 relative overflow-hidden min-h-[170px] flex flex-col items-center justify-center">
+                    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-4 text-center bg-slate-900/50 relative overflow-hidden min-h-[170px] flex flex-col items-center justify-center">
                         <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-slate-950/90 backdrop-blur" alt="Vista previa">
                         <div id="dropzoneText" class="space-y-2">
                             <div class="w-12 h-12 bg-slate-800 text-orange-400 rounded-full flex items-center justify-center mx-auto">
                                 <i class="fa-solid fa-barcode text-xl"></i>
                             </div>
-                            <p class="text-xs font-medium text-slate-300">Captura la guía para lectura automática</p>
-                        </div>
-                    </div>
-
-                    <div id="ocrProgress" class="hidden mt-3 space-y-1">
-                        <div class="flex justify-between text-xs text-slate-300">
-                            <span id="ocrStatus">Procesando OCR...</span>
-                            <span id="ocrPercent">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                            <div id="ocrBar" class="bg-orange-500 h-full w-0 transition-all duration-300"></div>
+                            <p class="text-xs font-medium text-slate-300">Presiona 'Tomar Foto' o 'Galería' abajo</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <!-- Botón Cámara directo Registro -->
                     <label class="bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-camera"></i> Tomar Foto
                         <input type="file" id="inputCam" accept="image/*" capture="environment" class="hidden">
                     </label>
 
-                    <!-- Botón Galería directo Registro -->
                     <label class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                         <i class="fa-solid fa-images"></i> Galería
                         <input type="file" id="inputGal" accept="image/*" class="hidden">
@@ -185,7 +163,7 @@
                 </div>
             </div>
 
-            <!-- Formulario de Registro Simplificado -->
+            <!-- Formulario de Registro -->
             <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm space-y-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-orange-400"></i>
@@ -363,16 +341,14 @@
         </div>
     </div>
 
-    <!-- NÚCLEO JAVASCRIPT -->
+    <!-- JAVASCRIPT SIN LIBRERÍAS PESADAS QUE BLOQUEEN LA IMAGEN -->
     <script>
-        // Estado global
         let AppState = {
             shift: { active: false, newReceived: 0, rerouted: 0, damaris: 0, oskar: 0, zahori: 0, anomalies: 0 },
             packages: [],
             filter: 'all'
         };
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             loadStorage();
             initApp();
@@ -399,14 +375,8 @@
             document.getElementById('inputResguardoDate').valueAsDate = new Date();
 
             // Modales de Turno
-            document.getElementById('btnAbrirTurno').onclick = () => {
-                document.getElementById('modalStart').classList.remove('hidden');
-            };
-
-            document.getElementById('modalStartCancel').onclick = () => {
-                document.getElementById('modalStart').classList.add('hidden');
-            };
-
+            document.getElementById('btnAbrirTurno').onclick = () => document.getElementById('modalStart').classList.remove('hidden');
+            document.getElementById('modalStartCancel').onclick = () => document.getElementById('modalStart').classList.add('hidden');
             document.getElementById('modalStartConfirm').onclick = iniciarTurnoAction;
 
             document.getElementById('btnCerrarTurno').onclick = () => {
@@ -417,33 +387,119 @@
                 document.getElementById('modalEnd').classList.remove('hidden');
             };
 
-            document.getElementById('modalEndCancel').onclick = () => {
-                document.getElementById('modalEnd').classList.add('hidden');
-            };
-
+            document.getElementById('modalEndCancel').onclick = () => document.getElementById('modalEnd').classList.add('hidden');
             document.getElementById('modalEndConfirm').onclick = cerrarTurnoAction;
             document.getElementById('btnResetDay').onclick = restablecerDiaAction;
 
-            // Inputs de cuadre
+            // Inputs cuadre
             document.getElementById('closeDamaris').oninput = calcularCuadreModal;
             document.getElementById('closeOskar').oninput = calcularCuadreModal;
             document.getElementById('closeZahori').oninput = calcularCuadreModal;
 
-            // Filtros de tabla
+            // Filtros
             document.getElementById('filterAll').onclick = () => setFilter('all');
             document.getElementById('filterResguardo').onclick = () => setFilter('resguardo');
             document.getElementById('searchInput').oninput = renderTable;
             document.getElementById('btnExport').onclick = exportarCSV;
 
-            // Búsqueda de clientes/guías
+            // Búsqueda
             document.getElementById('dbSearchInput').oninput = buscarClienteDB;
 
             // Formulario
             document.getElementById('pkgForm').onsubmit = guardarPaqueteAction;
 
-            setupOCR();
-            setupSearchOCR();
+            // LISTENERS DIRECTOS DE CARGA DE IMÁGENES
+            setupImageInputs();
             refreshUI();
+        }
+
+        function setupImageInputs() {
+            // Manejo de imagen en REGISTRO
+            const inputCam = document.getElementById('inputCam');
+            const inputGal = document.getElementById('inputGal');
+
+            const handleRegImage = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = document.getElementById('imagePreview');
+                    img.src = event.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('dropzoneText').classList.add('opacity-20');
+
+                    // Detección automática de guía nativa
+                    detectBarcode(file, (tracking) => {
+                        if (tracking) {
+                            document.getElementById('inputTracking').value = tracking;
+                            verificarEntregaResguardo(tracking);
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+
+            inputCam.onchange = handleRegImage;
+            inputGal.onchange = handleRegImage;
+
+            // Manejo de imagen en BÚSQUEDA
+            const searchCam = document.getElementById('searchCamInput');
+            const searchGal = document.getElementById('searchGalInput');
+
+            const handleSearchImage = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = document.getElementById('searchPreviewImg');
+                    img.src = event.target.result;
+                    document.getElementById('searchImgContainer').classList.remove('hidden');
+
+                    detectBarcode(file, (tracking) => {
+                        if (tracking) {
+                            document.getElementById('dbSearchInput').value = tracking;
+                            buscarClienteDB();
+                        } else {
+                            alert("Imagen cargada. Si la guía no se lee automáticamente, ingresa el número en la barra de búsqueda.");
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+
+            searchCam.onchange = handleSearchImage;
+            searchGal.onchange = handleSearchImage;
+        }
+
+        // LECTOR NATIVO RÁPIDO (BarcodeDetector o coincidencia rápida)
+        async function detectBarcode(file, callback) {
+            if ('BarcodeDetector' in window) {
+                try {
+                    const detector = new BarcodeDetector({ formats: ['code_128', 'code_39', 'qr_code', 'ean_13', 'itf'] });
+                    const bitmap = await createImageBitmap(file);
+                    const barcodes = await detector.detect(bitmap);
+                    if (barcodes.length > 0) {
+                        return callback(barcodes[0].rawValue.toUpperCase());
+                    }
+                } catch (err) {
+                    console.log("BarcodeDetector fallback", err);
+                }
+            }
+            callback(null);
+        }
+
+        function verificarEntregaResguardo(tracking) {
+            const idx = AppState.packages.findIndex(p => p.tracking === tracking);
+            if (idx !== -1 && AppState.packages[idx].status === 'Resguardo') {
+                if (confirm(`El paquete ${tracking} de ${AppState.packages[idx].name} está 'En Resguardo'. ¿Deseas marcarlo como ENTREGADO en este momento?`)) {
+                    AppState.packages[idx].status = 'Entregado';
+                    saveStorage();
+                    refreshUI();
+                    alert(`¡Paquete ${tracking} entregado con éxito!`);
+                }
+            }
         }
 
         function iniciarTurnoAction() {
@@ -549,10 +605,10 @@
             document.getElementById('pkgForm').reset();
             document.getElementById('inputResguardoDate').valueAsDate = new Date();
             document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('dropzoneText').classList.remove('opacity-20');
         }
 
         function refreshUI() {
-            // Dashboard
             document.getElementById('kpiRecibidos').innerText = AppState.shift.newReceived || 0;
             document.getElementById('kpiReenrutados').innerText = AppState.shift.rerouted || 0;
             document.getElementById('kpiDamaris').innerText = AppState.shift.damaris || 0;
@@ -562,7 +618,6 @@
             const resguardosActivos = AppState.packages.filter(p => p.status === 'Resguardo').length;
             document.getElementById('kpiResguardo').innerText = resguardosActivos;
 
-            // Badge
             const dot = document.getElementById('badgeDot');
             const txt = document.getElementById('badgeText');
             const btnAbrir = document.getElementById('btnAbrirTurno');
@@ -660,7 +715,6 @@
             }
         }
 
-        // BÚSQUEDA HISTÓRICA
         function buscarClienteDB() {
             const q = document.getElementById('dbSearchInput').value.trim().toLowerCase();
             const box = document.getElementById('dbSearchResult');
@@ -767,134 +821,6 @@
 
             box.innerHTML = html;
             box.classList.remove('hidden');
-        }
-
-        // ESCÁNER OCR BUSCADOR
-        function setupSearchOCR() {
-            const cam = document.getElementById('searchCamInput');
-            const gal = document.getElementById('searchGalInput');
-
-            const handleSearchFile = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const prog = document.getElementById('searchOcrProgress');
-                const bar = document.getElementById('searchOcrBar');
-                const status = document.getElementById('searchOcrStatus');
-
-                prog.classList.remove('hidden');
-
-                try {
-                    const worker = await Tesseract.createWorker('spa');
-                    worker.setParameters({
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                const val = Math.round(m.progress * 100);
-                                bar.style.width = `${val}%`;
-                                document.getElementById('searchOcrPercent').innerText = `${val}%`;
-                                status.innerText = 'Escaneando etiqueta...';
-                            }
-                        }
-                    });
-
-                    const { data: { text } } = await worker.recognize(file);
-                    await worker.terminate();
-
-                    status.innerText = '¡Guía detectada!';
-                    
-                    const trackMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
-                    if (trackMatch) {
-                        const tracking = trackMatch[0].toUpperCase();
-                        document.getElementById('dbSearchInput').value = tracking;
-                        buscarClienteDB();
-                    } else {
-                        alert("No se identificó un número de guía claro.");
-                    }
-
-                } catch (err) {
-                    console.error(err);
-                    status.innerText = 'Error al escanear.';
-                } setTimeout(() => prog.classList.add('hidden'), 3000);
-            };
-
-            cam.onchange = handleSearchFile;
-            gal.onchange = handleSearchFile;
-        }
-
-        // ESCÁNER OCR REGISTRO
-        function setupOCR() {
-            const cam = document.getElementById('inputCam');
-            const gal = document.getElementById('inputGal');
-
-            const handleFile = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = document.getElementById('imagePreview');
-                    img.src = ev.target.result;
-                    img.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-
-                const prog = document.getElementById('ocrProgress');
-                const bar = document.getElementById('ocrBar');
-                const status = document.getElementById('ocrStatus');
-
-                prog.classList.remove('hidden');
-
-                try {
-                    const worker = await Tesseract.createWorker('spa');
-                    worker.setParameters({
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                const val = Math.round(m.progress * 100);
-                                bar.style.width = `${val}%`;
-                                document.getElementById('ocrPercent').innerText = `${val}%`;
-                                status.innerText = 'Procesando lectura...';
-                            }
-                        }
-                    });
-
-                    const { data: { text } } = await worker.recognize(file);
-                    await worker.terminate();
-
-                    status.innerText = '¡OCR Lectura lista!';
-                    parseOCR(text);
-                } catch (err) {
-                    console.error(err);
-                    status.innerText = 'Error al leer imagen.';
-                } setTimeout(() => prog.classList.add('hidden'), 3000);
-            };
-
-            cam.onchange = handleFile;
-            gal.onchange = handleFile;
-        }
-
-        function parseOCR(text) {
-            const trackMatch = text.match(/\b(JMX\d{10,14}|[A-Z0-9]{10,18})\b/i);
-            if (trackMatch) {
-                const t = trackMatch[0].toUpperCase();
-                document.getElementById('inputTracking').value = t;
-
-                const idx = AppState.packages.findIndex(p => p.tracking === t);
-                if (idx !== -1 && AppState.packages[idx].status === 'Resguardo') {
-                    if (confirm(`El paquete ${t} está 'En Resguardo'. ¿Deseas marcarlo como ENTREGADO?`)) {
-                        AppState.packages[idx].status = 'Entregado';
-                        saveStorage();
-                        refreshUI();
-                        alert(`¡Paquete ${t} entregado!`);
-                        return;
-                    }
-                }
-            }
-
-            const nameMatch = text.match(/Nombre[:\s]*([A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,30})/i);
-            if (nameMatch) document.getElementById('inputName').value = nameMatch[1].trim();
-
-            const phoneMatch = text.match(/\b(\d{10}|\d{3}[\s-]?\d{3}[\s-]?\d{4})\b/);
-            if (phoneMatch) document.getElementById('inputPhone').value = phoneMatch[0].replace(/\D/g, '');
         }
 
         function exportarCSV() {
